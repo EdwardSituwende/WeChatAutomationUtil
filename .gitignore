@@ -7,3 +7,6 @@
 /build
 /captures
 .externalNativeBuild
+/app/build/
+/.idea/
+/.idea/vcs.xml
