@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import java.io.DataOutputStream;
+import java.io.OutputStream;
 
 import per.edward.wechatautomationutil.utils.Constant;
 
@@ -54,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putInt(Constant.COUNT, Integer.valueOf(editCount.getText().toString()));
         if (editor.commit()) {
             Toast.makeText(getBaseContext(), "保存成功", Toast.LENGTH_LONG).show();
-
+            startCountTimer();
             PackageManager packageManager = getBaseContext().getPackageManager();
             Intent it= packageManager.getLaunchIntentForPackage("com.tencent.mm");
             startActivity(it);
@@ -63,8 +66,49 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-//    private void fun(Robot robot) {
+    private void fun(String cmd) {
+        try {
+            // 申请获取root权限，这一步很重要，不然会没有作用
+            Process process = Runtime.getRuntime().exec("su");
+            // 获取输出流
+            OutputStream outputStream = process.getOutputStream();
+            DataOutputStream dataOutputStream = new DataOutputStream(
+                    outputStream);
+            dataOutputStream.writeBytes(cmd);
+            dataOutputStream.flush();
+            dataOutputStream.close();
+            outputStream.close();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
 
-//    }
+    private void startCountTimer() {
+        //点击底部tab按钮坐标 550 1674
+        //点击朋友圈坐标196 300
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+//               fun("input tap 550 1674");
+                try {
+                    // 申请获取root权限，这一步很重要，不然会没有作用
+                    Process process = Runtime.getRuntime().exec("su");
+                    // 获取输出流
+                    OutputStream outputStream = process.getOutputStream();
+                    DataOutputStream dataOutputStream = new DataOutputStream(
+                            outputStream);
+                    dataOutputStream.writeBytes("input tap 550 1674");
+                    dataOutputStream.flush();
+                    dataOutputStream.close();
+                    outputStream.close();
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+        }, 3000);
+
+
+
+    }
 
 }
