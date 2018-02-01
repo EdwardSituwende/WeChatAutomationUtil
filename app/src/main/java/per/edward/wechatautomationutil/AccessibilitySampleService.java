@@ -2,6 +2,8 @@ package per.edward.wechatautomationutil;
 
 import android.accessibilityservice.AccessibilityService;
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -11,6 +13,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import per.edward.wechatautomationutil.utils.Constant;
 import per.edward.wechatautomationutil.utils.LogUtil;
 
 /**
@@ -19,10 +22,12 @@ import per.edward.wechatautomationutil.utils.LogUtil;
 
 @TargetApi(16)
 public class AccessibilitySampleService extends AccessibilityService {
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
+        sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_PRIVATE);
     }
 
     private AccessibilityNodeInfo accessibilityNodeInfo;
@@ -31,23 +36,43 @@ public class AccessibilitySampleService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
+
         int eventType = event.getEventType();
         Log.e("事件类型:", Integer.toHexString(eventType) + "         " + event.getClassName());
         accessibilityNodeInfo = getRootInActiveWindow();
         switch (eventType) {
             case AccessibilityEvent.TYPE_VIEW_SCROLLED:
                 if (!sendSuccess && event.getClassName().equals("android.widget.ListView")) {
+                    if (accessibilityNodeInfo == null) {
+                        return;
+                    }
                     sendCircleOfFriend();
                     openAlbum();
                 }
 
                 if (!sendSuccess && event.getClassName().equals("android.widget.GridView")) {
-                    choosePicture(0, 5);
+                    if (sharedPreferences != null) {
+                        int index = sharedPreferences.getInt(Constant.INDEX, 0);
+                        int count = sharedPreferences.getInt(Constant.COUNT, 0);
+                        Log.e("输出", index + "      " + count);
+                        choosePicture(index, count);
+                    } else {
+                        Log.e("TYPE_VIEW_SCROLLED", "sharedPreferences is null!");
+                    }
                 }
                 break;
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
+                if (accessibilityNodeInfo == null) {
+                    return;
+                }
+
                 if (!sendSuccess && event.getClassName().equals("com.tencent.mm.plugin.sns.ui.SnsUploadUI")) {//com.tencent.mm.plugin.sns.ui.SnsTimeLineUI
-                    inputContentFinish("Hello World");
+                    if (sharedPreferences != null) {
+                        String content = sharedPreferences.getString(Constant.CONTENT, "");
+                    inputContentFinish("哈哈");
+                    }else{
+                        Log.e("TYPE_WINDOW_STATE_CHANGED", "sharedPreferences is null!");
+                    }
                 }
                 break;
         }
@@ -82,23 +107,24 @@ public class AccessibilitySampleService extends AccessibilityService {
      * @param picCount      总共选picCount张
      */
     private void choosePicture(final int startPicIndex, final int picCount) {
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
         List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/cyh");
         for (int i = 0; i < accessibilityNodeInfoList.size(); i++) {
             for (int j = startPicIndex; j < picCount; j++) {
-                AccessibilityNodeInfo t111 = accessibilityNodeInfoList.get(i).getChild(j);
-                List<AccessibilityNodeInfo> list11 = t111.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/bnl");
-                list11.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                AccessibilityNodeInfo childNodeInfo = accessibilityNodeInfoList.get(i).getChild(j);
+                if (childNodeInfo != null) {
+                    List<AccessibilityNodeInfo> childNodeInfoList = childNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/bnl");
+                    if (childNodeInfoList != null && childNodeInfoList.size() != 0) {
+                        childNodeInfoList.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                    }
+                }
             }
         }
 
-        List<AccessibilityNodeInfo> accessibilityNodeInfoList1111 = accessibilityNodeInfo.findAccessibilityNodeInfosByText("完成(" + picCount + "/9)");//点击确定
-        accessibilityNodeInfoList1111.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-//            }
-//        }, 3000);
-
+        List<AccessibilityNodeInfo> finishList = accessibilityNodeInfo.findAccessibilityNodeInfosByText("完成(" + picCount + "/9)");//点击确定
+        if (finishList != null && finishList.size() != 0) {
+            finishList.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+            Toast.makeText(getBaseContext(), "选择图片", Toast.LENGTH_LONG).show();
+        }
     }
 
     /**
@@ -126,8 +152,12 @@ public class AccessibilitySampleService extends AccessibilityService {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                if (accessibilityNodeInfo == null) {
+                    return;
+                }
+
                 List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/axk");
-                if (accessibilityNodeInfoList != null && accessibilityNodeInfoList.get(0).getChildCount() != 0) {
+                if (accessibilityNodeInfoList != null && accessibilityNodeInfoList.size() != 0 && accessibilityNodeInfoList.get(0).getChildCount() != 0) {
                     accessibilityNodeInfoList.get(0).getChild(1).performAction(AccessibilityNodeInfo.ACTION_CLICK);
                     LogUtil.e("打开相册成功!");
                 }
@@ -139,5 +169,9 @@ public class AccessibilitySampleService extends AccessibilityService {
     @Override
     public void onInterrupt() {
 
+    }
+
+    public static void main(String[] args) {
+        System.out.print("测试");
     }
 }

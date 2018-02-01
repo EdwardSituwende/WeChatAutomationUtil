@@ -37,14 +37,15 @@
             android:layout_height="wrap_content"
             android:inputType="number" />
 
-        <EditText
-            android:id="@+id/edit_count"
+        <TextView
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="图片总数(最多9张)：" />
 
 
         <EditText
+            android:id="@+id/edit_count"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:inputType="number" />
