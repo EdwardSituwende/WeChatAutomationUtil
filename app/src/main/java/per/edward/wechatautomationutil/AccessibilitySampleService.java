@@ -11,6 +11,7 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Toast;
 
+import java.io.RandomAccessFile;
 import java.util.List;
 
 import per.edward.wechatautomationutil.utils.Constant;
@@ -127,6 +128,9 @@ public class AccessibilitySampleService extends AccessibilityService {
         }
     }
 
+
+
+
     /**
      * 发送朋友圈
      */
@@ -171,7 +175,7 @@ public class AccessibilitySampleService extends AccessibilityService {
 
     }
 
-    public static void main(String[] args) {
-        System.out.print("测试");
-    }
+//    public static void main(String[] args) {
+//        System.out.print("测试");
+//    }
 }

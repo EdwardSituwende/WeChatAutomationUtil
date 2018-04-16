@@ -52,20 +52,20 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private void saveData() {
-//        SharedPreferences sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.putString(Constant.CONTENT, edit.getText().toString());
-//        editor.putInt(Constant.INDEX, Integer.valueOf(editIndex.getText().toString()));
-//        editor.putInt(Constant.COUNT, Integer.valueOf(editCount.getText().toString()));
-//        if (editor.commit()) {
-//            Toast.makeText(getBaseContext(), "保存成功", Toast.LENGTH_LONG).show();
-        startCountTimer();
-//            PackageManager packageManager = getBaseContext().getPackageManager();
-//            Intent it= packageManager.getLaunchIntentForPackage("com.tencent.mm");
-//            startActivity(it);
-//        } else {
-//            Toast.makeText(getBaseContext(), "保存失败", Toast.LENGTH_LONG).show();
-//        }
+        SharedPreferences sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(Constant.CONTENT, edit.getText().toString());
+        editor.putInt(Constant.INDEX, Integer.valueOf(editIndex.getText().toString()));
+        editor.putInt(Constant.COUNT, Integer.valueOf(editCount.getText().toString()));
+        if (editor.commit()) {
+            Toast.makeText(getBaseContext(), "保存成功", Toast.LENGTH_LONG).show();
+//        startCountTimer();
+            PackageManager packageManager = getBaseContext().getPackageManager();
+            Intent it= packageManager.getLaunchIntentForPackage("com.tencent.mm");
+            startActivity(it);
+        } else {
+            Toast.makeText(getBaseContext(), "保存失败", Toast.LENGTH_LONG).show();
+        }
     }
 
 
