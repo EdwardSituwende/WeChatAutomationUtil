@@ -39,9 +39,11 @@ public class AccessibilitySampleService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
+        SharedPreferences sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_PRIVATE);
+        flag = sharedPreferences.getBoolean(Constant.IS_SENDED, false);
 
         int eventType = event.getEventType();
-        Log.e("事件类型", eventType + "             " + Integer.toHexString(eventType) + "         " + event.getClassName());
+        Log.e("事件类型", eventType + "             " + Integer.toHexString(eventType) + "         " + event.getClassName()+"        "+flag);
         accessibilityNodeInfo = getRootInActiveWindow();
         switch (eventType) {
             case AccessibilityEvent.TYPE_VIEW_SCROLLED:
@@ -54,7 +56,7 @@ public class AccessibilitySampleService extends AccessibilityService {
                 }
 
                 if (!flag && event.getClassName().equals("android.widget.GridView")) {
-                    SharedPreferences sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_PRIVATE);
+                     sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_PRIVATE);
                     if (sharedPreferences != null) {
                         int index = sharedPreferences.getInt(Constant.INDEX, 0);
                         int count = sharedPreferences.getInt(Constant.COUNT, 0);
@@ -74,7 +76,7 @@ public class AccessibilitySampleService extends AccessibilityService {
                 }
 
                 if (!flag && event.getClassName().equals("com.tencent.mm.plugin.sns.ui.SnsUploadUI")) {//com.tencent.mm.plugin.sns.ui.SnsTimeLineUI
-                    SharedPreferences sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_PRIVATE);
+
                     if (sharedPreferences != null) {
                         String content = sharedPreferences.getString(Constant.CONTENT, "");
                         inputContentFinish(content);
@@ -104,8 +106,16 @@ public class AccessibilitySampleService extends AccessibilityService {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                List<AccessibilityNodeInfo> accessibilityNodeInfoList1 = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("android:id/list");
-                accessibilityNodeInfoList1.get(0).getChild(1).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("android:id/list");
+                if (accessibilityNodeInfoList != null && accessibilityNodeInfoList.size() != 0) {
+                    AccessibilityNodeInfo accessibilityNodeInfo = accessibilityNodeInfoList.get(0);
+                    if (accessibilityNodeInfo != null) {
+                        accessibilityNodeInfo = accessibilityNodeInfo.getChild(1);
+                        if (accessibilityNodeInfo != null) {
+                            accessibilityNodeInfo.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                        }
+                    }
+                }
             }
         }, 1500);
     }
@@ -123,6 +133,9 @@ public class AccessibilitySampleService extends AccessibilityService {
                 if (accessibilityNodeInfoList1.size() > 0) {
                     ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                     ClipData clip = ClipData.newPlainText("text", contentStr);
+                    if (clipboard == null) {
+                        return;
+                    }
                     clipboard.setPrimaryClip(clip);
                     accessibilityNodeInfoList1.get(0).performAction(AccessibilityNodeInfo.ACTION_FOCUS);
                     accessibilityNodeInfoList1.get(0).performAction(AccessibilityNodeInfo.ACTION_PASTE);
@@ -133,12 +146,17 @@ public class AccessibilitySampleService extends AccessibilityService {
                         accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/h5");//点击发送
                 if (accessibilityNodeInfoList == null || accessibilityNodeInfoList.size() == 0) {
                     LogUtil.e("发送朋友圈失败");
+                    return;
                 }
 
                 if (accessibilityNodeInfoList.size() > 0) {
                     accessibilityNodeInfoList.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
                     Toast.makeText(getApplicationContext(), "发送朋友圈成功", Toast.LENGTH_LONG).show();
                     flag = true;
+                    SharedPreferences sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_PRIVATE);
+                    SharedPreferences.Editor editor=sharedPreferences.edit();
+                    editor.putBoolean(Constant.IS_SENDED, true);
+                    editor.apply();
                 }
             }
         }, 1500);

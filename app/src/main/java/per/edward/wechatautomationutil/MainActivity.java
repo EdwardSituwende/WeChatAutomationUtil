@@ -86,9 +86,9 @@ public class MainActivity extends AppCompatActivity {
         editor.putString(Constant.CONTENT, edit.getText().toString());
         editor.putInt(Constant.INDEX, index);
         editor.putInt(Constant.COUNT, count);
+        editor.putBoolean(Constant.IS_SENDED, false);
         if (editor.commit()) {
-            AccessibilitySampleService.flag = false;
-            Toast.makeText(getBaseContext(), "保存成功"+AccessibilitySampleService.flag, Toast.LENGTH_LONG).show();
+            Toast.makeText(getBaseContext(), "保存成功", Toast.LENGTH_LONG).show();
             openWeChatApplication();//打开微信应用
         } else {
             Toast.makeText(getBaseContext(), "保存失败", Toast.LENGTH_LONG).show();
