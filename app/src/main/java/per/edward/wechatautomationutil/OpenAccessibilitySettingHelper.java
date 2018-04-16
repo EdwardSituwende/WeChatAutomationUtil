@@ -3,10 +3,6 @@ package per.edward.wechatautomationutil;
 import android.content.Context;
 import android.content.Intent;
 
-/**
- * Created by popfisher on 2017/7/6.
- */
-
 public class OpenAccessibilitySettingHelper {
     private static final String ACTION = "action";
     private static final String ACTION_START_ACCESSIBILITY_SETTING = "action_start_accessibility_setting";

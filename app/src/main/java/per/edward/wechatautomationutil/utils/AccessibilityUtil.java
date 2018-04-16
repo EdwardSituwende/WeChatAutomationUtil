@@ -33,7 +33,6 @@ public class AccessibilityUtil {
 
         String packageName = context.getPackageName();
         final String serviceStr = packageName + "/" + ACCESSIBILITY_SERVICE_PATH;
-        AccessibilityLog.printLog("serviceStr: " + serviceStr);
         if (accessibilityEnabled == 1) {
             TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(':');
 
