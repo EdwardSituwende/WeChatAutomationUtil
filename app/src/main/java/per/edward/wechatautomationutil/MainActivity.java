@@ -14,9 +14,9 @@ import android.widget.Toast;
 import per.edward.wechatautomationutil.utils.Constant;
 
 /**
- * 使用条件
+ * 注意事项
  * 1、Android设备必须安装微信app
- * 2、Android设备版本必须大于18
+ * 2、Android Sdk Version
  * <p>
  * Created by Edward on 2018-03-15.
  */
