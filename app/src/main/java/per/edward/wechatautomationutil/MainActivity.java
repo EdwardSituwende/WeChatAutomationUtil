@@ -17,7 +17,6 @@ import per.edward.wechatautomationutil.utils.Constant;
  * 使用条件
  * 1、Android设备必须安装微信app
  * 2、Android设备版本必须大于18
- * 3、自动化过程中请勿操作Android设备屏幕!!!
  * <p>
  * Created by Edward on 2018-03-15.
  */
@@ -86,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
         editor.putString(Constant.CONTENT, edit.getText().toString());
         editor.putInt(Constant.INDEX, index);
         editor.putInt(Constant.COUNT, count);
-//        editor.putBoolean(Constant.IS_SENDED, false);
         if (editor.commit()) {
             Toast.makeText(getBaseContext(), "保存成功", Toast.LENGTH_LONG).show();
             openWeChatApplication();//打开微信应用

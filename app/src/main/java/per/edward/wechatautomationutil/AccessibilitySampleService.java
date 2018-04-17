@@ -27,7 +27,7 @@ public class AccessibilitySampleService extends AccessibilityService {
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
-
+        flag = false;
     }
 
     private AccessibilityNodeInfo accessibilityNodeInfo;
@@ -40,43 +40,28 @@ public class AccessibilitySampleService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         SharedPreferences sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_PRIVATE);
-//        flag = sharedPreferences.getBoolean(Constant.IS_SENDED, false);
-
         int eventType = event.getEventType();
-        Log.e("事件类型", eventType + "             " + Integer.toHexString(eventType) + "         " + event.getClassName() + "        " + flag);
+        LogUtil.e(eventType + "             " + Integer.toHexString(eventType) + "         " + event.getClassName());
         accessibilityNodeInfo = getRootInActiveWindow();
+        if (accessibilityNodeInfo == null) {
+            return;
+        }
         switch (eventType) {
             case AccessibilityEvent.TYPE_VIEW_SCROLLED:
                 if (!flag && event.getClassName().equals("android.widget.ListView")) {
-                    if (accessibilityNodeInfo == null) {
-                        return;
-                    }
-                    clickCircleOfFriendsBtn();
+                    clickCircleOfFriendsBtn();//点击发送朋友圈按钮
                 }
 
-//                if (!flag && event.getClassName().equals("android.widget.GridView")) {
-//                    sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_PRIVATE);
-//                    if (sharedPreferences != null) {
-//                        int index = sharedPreferences.getInt(Constant.INDEX, 0);
-//                        int count = sharedPreferences.getInt(Constant.COUNT, 0);
-//                        choosePicture(index, count);
-//                    }
-//                }
                 break;
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
-//                Log.e("事件类型", "程序启动");
-                if (accessibilityNodeInfo == null) {
-                    return;
-                }
-
-                if (!flag && event.getClassName().equals("com.tencent.mm.ui.LauncherUI")) {//第一次启动app
-//                    clickDiscoverButton();//点击发现按钮
+                if (event.getClassName().equals("com.tencent.mm.ui.LauncherUI")) {//第一次启动app
+                    flag = false;
                     jumpToCircleOfFriends();//进入朋友圈页面
                 }
 
-                if (!flag && event.getClassName().equals("com.tencent.mm.plugin.sns.ui.SnsUploadUI")) {//com.tencent.mm.plugin.sns.ui.SnsTimeLineUI
+                if (!flag && event.getClassName().equals("com.tencent.mm.plugin.sns.ui.SnsUploadUI")) {
                     String content = sharedPreferences.getString(Constant.CONTENT, "");
-                    inputContentFinish(content);
+                    inputContentFinish(content);//写入要发送的朋友圈内容
                 }
                 break;
         }
@@ -122,7 +107,7 @@ public class AccessibilitySampleService extends AccessibilityService {
                     clipboard.setPrimaryClip(clip);
                     accessibilityNodeInfoList1.get(0).performAction(AccessibilityNodeInfo.ACTION_FOCUS);
                     accessibilityNodeInfoList1.get(0).performAction(AccessibilityNodeInfo.ACTION_PASTE);
-                    LogUtil.e("成功写入内容");
+                    LogUtil.e("写入内容");
                 }
 
                 List<AccessibilityNodeInfo> accessibilityNodeInfoList =
@@ -133,11 +118,7 @@ public class AccessibilitySampleService extends AccessibilityService {
                 }
                 accessibilityNodeInfoList.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
                 Toast.makeText(getApplicationContext(), "发送朋友圈成功", Toast.LENGTH_LONG).show();
-                flag = true;
-//                SharedPreferences sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_PRIVATE);
-//                SharedPreferences.Editor editor = sharedPreferences.edit();
-//                editor.putBoolean(Constant.IS_SENDED, true);
-//                editor.apply();
+                flag = true;//标记为已发送
             }
         }, 1500);
     }
@@ -183,18 +164,6 @@ public class AccessibilitySampleService extends AccessibilityService {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-//                List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/go");
-//                for (int i = 0; i < accessibilityNodeInfoList.size(); i++) {
-//                    for (int j = 0; j < accessibilityNodeInfoList.get(i).getChildCount(); j++) {
-//                        AccessibilityNodeInfo temp = accessibilityNodeInfoList.get(i).getChild(j);
-//                        if (temp.getContentDescription() != null) {
-//                            String t1 = temp.getContentDescription().toString();
-//                            if (t1.equals("更多功能按钮")) {
-//                                accessibilityNodeInfoList.get(i).getChild(j).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-//                            }
-//                        }
-//                    }
-//                }
                 if (accessibilityNodeInfo == null) {
                     return;
                 }
@@ -223,7 +192,7 @@ public class AccessibilitySampleService extends AccessibilityService {
                 List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/axk");
                 if (accessibilityNodeInfoList != null && accessibilityNodeInfoList.size() != 0 && accessibilityNodeInfoList.get(0).getChildCount() != 0) {
                     accessibilityNodeInfoList.get(0).getChild(1).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                    LogUtil.e("打开相册成功!");
+                    LogUtil.e("打开相册!");
 
                     SharedPreferences sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_PRIVATE);
                     if (sharedPreferences != null) {
