@@ -16,7 +16,9 @@
 </br></br></br>
 ### 四、注意事项
 1、Android设备必须安装微信app
+</br>
 2、Android Sdk Version>18
+</br>
 <font color=#ff0000>特别提醒（不需要获取root权限）</font>
 </br></br></br>
 ### 五、Repository
