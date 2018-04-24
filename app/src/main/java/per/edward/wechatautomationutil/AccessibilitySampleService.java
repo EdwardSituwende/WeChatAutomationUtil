@@ -134,7 +134,13 @@ public class AccessibilitySampleService extends AccessibilityService {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                if (accessibilityNodeInfo == null) {
+                    return;
+                }
                 List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/cyh");
+                if (accessibilityNodeInfoList == null) {
+                    return;
+                }
                 for (int i = 0; i < accessibilityNodeInfoList.size(); i++) {
                     for (int j = startPicIndex; j < startPicIndex + picCount; j++) {
                         AccessibilityNodeInfo childNodeInfo = accessibilityNodeInfoList.get(i).getChild(j);
@@ -172,11 +178,20 @@ public class AccessibilitySampleService extends AccessibilityService {
                 if (accessibilityNodeInfoList != null && accessibilityNodeInfoList.size() != 0 &&
                         accessibilityNodeInfoList.get(0) != null && accessibilityNodeInfoList.get(0).getParent() != null) {
                     accessibilityNodeInfoList.get(0).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                    openAlbum();
+                } else {
+                    accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByText("更多功能按钮");
+                    if (accessibilityNodeInfoList != null && accessibilityNodeInfoList.size() != 0 && accessibilityNodeInfoList.get(0) != null) {
+                        accessibilityNodeInfoList.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                        openAlbum();
+                    } else {
+                        LogUtil.e("没有找到点击朋友圈按钮!");
+                    }
                 }
-                openAlbum();
             }
         }, 1500);
     }
+
 
     /**
      * 打开相册
@@ -189,10 +204,11 @@ public class AccessibilitySampleService extends AccessibilityService {
                     return;
                 }
 
-                List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/axk");
-                if (accessibilityNodeInfoList != null && accessibilityNodeInfoList.size() != 0 && accessibilityNodeInfoList.get(0).getChildCount() != 0) {
-                    accessibilityNodeInfoList.get(0).getChild(1).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                    LogUtil.e("打开相册!");
+                List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByText("从相册选择");
+                if (accessibilityNodeInfoList != null && accessibilityNodeInfoList.get(0) != null &&
+                        accessibilityNodeInfoList.get(0).getParent() != null && accessibilityNodeInfoList.get(0).getParent().getChildCount() != 0 &&
+                        accessibilityNodeInfoList.get(0).getParent().getChild(0).getParent() != null) {
+                    accessibilityNodeInfoList.get(0).getParent().getChild(0).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);//点击从相册中选择
 
                     SharedPreferences sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_PRIVATE);
                     if (sharedPreferences != null) {
@@ -203,6 +219,15 @@ public class AccessibilitySampleService extends AccessibilityService {
                 }
             }
         }, 1500);
+    }
+
+    private void fun1() {
+        List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByText("从相册选择");
+        if (accessibilityNodeInfoList != null && accessibilityNodeInfoList.get(0) != null &&
+                accessibilityNodeInfoList.get(0).getParent() != null && accessibilityNodeInfoList.get(0).getParent().getChildCount() != 0 &&
+                accessibilityNodeInfoList.get(0).getParent().getChild(0).getParent() != null) {
+            accessibilityNodeInfoList.get(0).getParent().getChild(0).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
+        }
     }
 
 
