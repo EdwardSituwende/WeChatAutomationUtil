@@ -96,9 +96,12 @@ public class AccessibilitySampleService extends AccessibilityService {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                List<AccessibilityNodeInfo> accessibilityNodeInfoList1 = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/dba");
+                if (accessibilityNodeInfo == null) {
+                    return;
+                }
+                List<AccessibilityNodeInfo> accessibilityNodeInfoList1 = accessibilityNodeInfo.findAccessibilityNodeInfosByText("这一刻的想法...");
                 for (int i = 0; i < accessibilityNodeInfoList1.size(); i++) {
-                    AccessibilityNodeInfo accessibilityNodeInfo = accessibilityNodeInfoList1.get(i);
+                    final AccessibilityNodeInfo accessibilityNodeInfo = accessibilityNodeInfoList1.get(i);
                     if (accessibilityNodeInfo != null) {
                         if (accessibilityNodeInfo.isFocusable() && accessibilityNodeInfo.isClickable() && accessibilityNodeInfo.isEnabled()) {
                             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
@@ -113,6 +116,7 @@ public class AccessibilitySampleService extends AccessibilityService {
                             List<AccessibilityNodeInfo> list = accessibilityNodeInfo.findAccessibilityNodeInfosByText("发送");//点击发送按钮
                             if (performClickBtn(list)) {
                                 flag = true;//标记为已发送
+                                return;
                             }
                         }
                     }
