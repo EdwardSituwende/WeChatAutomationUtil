@@ -8,10 +8,8 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
-import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -23,6 +21,7 @@ import per.edward.wechatautomationutil.utils.LogUtil;
  */
 @TargetApi(18)
 public class AccessibilitySampleService extends AccessibilityService {
+    private final int TEMP = 1500;
 
     @Override
     protected void onServiceConnected() {
@@ -85,7 +84,7 @@ public class AccessibilitySampleService extends AccessibilityService {
                     }
                 }
             }
-        }, 1500);
+        }, TEMP);
     }
 
     /**
@@ -98,29 +97,48 @@ public class AccessibilitySampleService extends AccessibilityService {
             @Override
             public void run() {
                 List<AccessibilityNodeInfo> accessibilityNodeInfoList1 = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/dba");
-                if (accessibilityNodeInfoList1.size() > 0) {
-                    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("text", contentStr);
-                    if (clipboard == null) {
-                        return;
-                    }
-                    clipboard.setPrimaryClip(clip);
-                    accessibilityNodeInfoList1.get(0).performAction(AccessibilityNodeInfo.ACTION_FOCUS);
-                    accessibilityNodeInfoList1.get(0).performAction(AccessibilityNodeInfo.ACTION_PASTE);
-                    LogUtil.e("写入内容");
-                }
+                for (int i = 0; i < accessibilityNodeInfoList1.size(); i++) {
+                    AccessibilityNodeInfo accessibilityNodeInfo = accessibilityNodeInfoList1.get(i);
+                    if (accessibilityNodeInfo != null) {
+                        if (accessibilityNodeInfo.isFocusable() && accessibilityNodeInfo.isClickable() && accessibilityNodeInfo.isEnabled()) {
+                            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                            ClipData clip = ClipData.newPlainText("text", contentStr);
+                            if (clipboard == null) {
+                                return;
+                            }
+                            clipboard.setPrimaryClip(clip);
+                            accessibilityNodeInfo.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
+                            accessibilityNodeInfo.performAction(AccessibilityNodeInfo.ACTION_PASTE);
 
-                List<AccessibilityNodeInfo> accessibilityNodeInfoList =
-                        accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/h5");//点击发送
-                if (accessibilityNodeInfoList == null || accessibilityNodeInfoList.size() == 0) {
-                    LogUtil.e("发送朋友圈失败");
-                    return;
+                            List<AccessibilityNodeInfo> list = accessibilityNodeInfo.findAccessibilityNodeInfosByText("发送");//点击发送按钮
+                            if (performClickBtn(list)) {
+                                flag = true;//标记为已发送
+                            }
+                        }
+                    }
                 }
-                accessibilityNodeInfoList.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                Toast.makeText(getApplicationContext(), "发送朋友圈成功", Toast.LENGTH_LONG).show();
-                flag = true;//标记为已发送
             }
-        }, 1500);
+        }, TEMP);
+    }
+
+    /**
+     * @param accessibilityNodeInfoList
+     * @return
+     */
+    private boolean performClickBtn(List<AccessibilityNodeInfo> accessibilityNodeInfoList) {
+        if (accessibilityNodeInfoList != null && accessibilityNodeInfoList.size() != 0) {
+            for (int i = 0; i < accessibilityNodeInfoList.size(); i++) {
+                AccessibilityNodeInfo accessibilityNodeInfo = accessibilityNodeInfoList.get(i);
+                if (accessibilityNodeInfo != null) {
+                    if (accessibilityNodeInfo.isClickable() && accessibilityNodeInfo.isEnabled()) {
+                        accessibilityNodeInfo.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+//        LogUtil.e("发送朋友圈失败");
     }
 
 
@@ -146,20 +164,15 @@ public class AccessibilitySampleService extends AccessibilityService {
                         AccessibilityNodeInfo childNodeInfo = accessibilityNodeInfoList.get(i).getChild(j);
                         if (childNodeInfo != null) {
                             List<AccessibilityNodeInfo> childNodeInfoList = childNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/bnl");
-                            if (childNodeInfoList != null && childNodeInfoList.size() != 0) {
-                                childNodeInfoList.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                            }
+                            performClickBtn(childNodeInfoList);
                         }
                     }
                 }
 
-                List<AccessibilityNodeInfo> finishList = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/h5");//点击确定
-                if (finishList != null && finishList.size() != 0) {
-                    finishList.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                    LogUtil.e("完成图片选择!");
-                }
+                List<AccessibilityNodeInfo> finishList = accessibilityNodeInfo.findAccessibilityNodeInfosByText("完成(" + picCount + "/9)");//点击确定
+                performClickBtn(finishList);
             }
-        }, 1500);
+        }, TEMP);
     }
 
 
@@ -174,22 +187,11 @@ public class AccessibilitySampleService extends AccessibilityService {
                     return;
                 }
 
-                List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/g1");
-                if (accessibilityNodeInfoList != null && accessibilityNodeInfoList.size() != 0 &&
-                        accessibilityNodeInfoList.get(0) != null && accessibilityNodeInfoList.get(0).getParent() != null) {
-                    accessibilityNodeInfoList.get(0).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                    openAlbum();
-                } else {
-                    accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByText("更多功能按钮");
-                    if (accessibilityNodeInfoList != null && accessibilityNodeInfoList.size() != 0 && accessibilityNodeInfoList.get(0) != null) {
-                        accessibilityNodeInfoList.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                        openAlbum();
-                    } else {
-                        LogUtil.e("没有找到点击朋友圈按钮!");
-                    }
-                }
+                List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByText("更多功能按钮");
+                performClickBtn(accessibilityNodeInfoList);
+                openAlbum();
             }
-        }, 1500);
+        }, TEMP);
     }
 
 
@@ -205,11 +207,7 @@ public class AccessibilitySampleService extends AccessibilityService {
                 }
 
                 List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByText("从相册选择");
-                if (accessibilityNodeInfoList != null && accessibilityNodeInfoList.get(0) != null &&
-                        accessibilityNodeInfoList.get(0).getParent() != null && accessibilityNodeInfoList.get(0).getParent().getChildCount() != 0 &&
-                        accessibilityNodeInfoList.get(0).getParent().getChild(0).getParent() != null) {
-                    accessibilityNodeInfoList.get(0).getParent().getChild(0).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);//点击从相册中选择
-
+                if (traverseNode(accessibilityNodeInfoList)) {
                     SharedPreferences sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_PRIVATE);
                     if (sharedPreferences != null) {
                         int index = sharedPreferences.getInt(Constant.INDEX, 0);
@@ -218,16 +216,24 @@ public class AccessibilitySampleService extends AccessibilityService {
                     }
                 }
             }
-        }, 1500);
+        }, TEMP);
     }
 
-    private void fun1() {
-        List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByText("从相册选择");
-        if (accessibilityNodeInfoList != null && accessibilityNodeInfoList.get(0) != null &&
-                accessibilityNodeInfoList.get(0).getParent() != null && accessibilityNodeInfoList.get(0).getParent().getChildCount() != 0 &&
-                accessibilityNodeInfoList.get(0).getParent().getChild(0).getParent() != null) {
-            accessibilityNodeInfoList.get(0).getParent().getChild(0).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
+    private boolean traverseNode(List<AccessibilityNodeInfo> accessibilityNodeInfoList) {
+        if (accessibilityNodeInfoList != null && accessibilityNodeInfoList.size() != 0) {
+            AccessibilityNodeInfo accessibilityNodeInfo = accessibilityNodeInfoList.get(0).getParent();
+            if (accessibilityNodeInfo != null && accessibilityNodeInfo.getChildCount() != 0) {
+                accessibilityNodeInfo = accessibilityNodeInfo.getChild(0);
+                if (accessibilityNodeInfo != null) {
+                    accessibilityNodeInfo = accessibilityNodeInfo.getParent();
+                    if (accessibilityNodeInfo != null) {
+                        accessibilityNodeInfo.performAction(AccessibilityNodeInfo.ACTION_CLICK);//点击从相册中选择
+                        return true;
+                    }
+                }
+            }
         }
+        return false;
     }
 
 

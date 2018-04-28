@@ -2,11 +2,12 @@
 ### 一、效果图
 ![微信自动化](https://github.com/EdwardSituwende/WeChatAutomationUtil/blob/master/wechat_auto.gif?raw=true)
 </br></br></br>
-### 二、测试Android设备
+### 二、测试设备和微信版本
 我在这两款设备测试正常，其它设备如果有什么问题，欢迎给我反馈^_^
 </br>
 夜神模拟器(Android 4.3)、华为荣耀8青春版(Android 7.0)
 </br></br></br>
+微信版本6.6.1
 ### 三、原理
 整个app的核心是AccessibilitySampleService类，它继承了AccessibilityService服务。
 在辅助功能打开之后，AccessibilitySampleService类会监听目标APP（微信）页面的状态变化。
@@ -19,7 +20,7 @@
 </br>
 2、Android Sdk Version>18
 </br>
-<font color=#ff0000>特别提醒（不需要获取root权限）</font>
+特别提醒（不需要获取root权限）
 </br></br></br>
 ### 五、Repository
 https://github.com/EdwardSituwende/WeChatAutomationUtil
