@@ -1,4 +1,9 @@
 #### 微信自动化工具---自动发送朋友圈（非root权限）
+### 2018-04-30更新
+最近有朋友反馈自动化工具不能使用，我仔细看了一下，发现微信每个版本的resource-id都会更改，
+导致自动化工具失效。此次更新我修改了查询结点的搜索方式，应该能够解决resource-id的问题。如果还有问题欢迎给我提issue。
+
+
 ### 一、效果图
 ![微信自动化](https://github.com/EdwardSituwende/WeChatAutomationUtil/blob/master/wechat_auto.gif?raw=true)
 </br></br></br>

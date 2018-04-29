@@ -112,12 +112,18 @@ public class AccessibilitySampleService extends AccessibilityService {
                     return;
                 }
 
-                List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByText("添加照片按钮");
-                if (accessibilityNodeInfoList == null || accessibilityNodeInfoList.size() == 0) {
+                List<AccessibilityNodeInfo> nodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByText("添加照片按钮");
+                if (nodeInfoList == null ||
+                        nodeInfoList.size() == 0||
+                        nodeInfoList.get(0)==null ||
+                        nodeInfoList.get(0).getParent()==null||
+                        nodeInfoList.get(0).getParent().getParent()==null||
+                        nodeInfoList.get(0).getParent().getParent().getParent()==null||
+                        nodeInfoList.get(0).getParent().getParent().getParent().getChild(0)==null) {
                     return;
                 }
 
-                AccessibilityNodeInfo tempInfo=accessibilityNodeInfoList.get(0).getParent().getParent().getParent().getChild(0);
+                AccessibilityNodeInfo tempInfo=nodeInfoList.get(0).getParent().getParent().getParent().getChild(0);
                 if (tempInfo.isEnabled() && tempInfo.isClickable() && tempInfo.isFocusable()) {
                                                 ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                             ClipData clip = ClipData.newPlainText("text", contentStr);
