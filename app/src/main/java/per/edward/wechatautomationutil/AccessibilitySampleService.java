@@ -8,6 +8,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
@@ -73,18 +74,29 @@ public class AccessibilitySampleService extends AccessibilityService {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("android:id/list");
-                if (accessibilityNodeInfoList != null && accessibilityNodeInfoList.size() != 0) {
-                    AccessibilityNodeInfo accessibilityNodeInfo = accessibilityNodeInfoList.get(0);
-                    if (accessibilityNodeInfo != null) {
-                        accessibilityNodeInfo = accessibilityNodeInfo.getChild(1);
-                        if (accessibilityNodeInfo != null) {
-                            accessibilityNodeInfo.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                        }
+                List<AccessibilityNodeInfo> list = accessibilityNodeInfo.findAccessibilityNodeInfosByText("朋友圈");
+                if (list != null && list.size()!=0) {
+                    AccessibilityNodeInfo tempInfo = list.get(0);
+                    if (tempInfo != null && tempInfo.getParent() != null) {
+                        tempInfo.getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
                     }
                 }
             }
         }, TEMP);
+    }
+
+    private void fun(AccessibilityNodeInfo accessibilityNodeInfo) {
+        if (accessibilityNodeInfo == null) {
+            return;
+        }
+
+        if (accessibilityNodeInfo.getChildCount() != 0) {
+            for (int i = 0; i < accessibilityNodeInfo.getChildCount(); i++) {
+                AccessibilityNodeInfo tempInfo = accessibilityNodeInfo.getChild(i);
+                Log.e("输出", tempInfo.getClassName().toString()+"      "+tempInfo.getViewIdResourceName());
+            }
+            fun(accessibilityNodeInfo.getChild(0).getParent());
+        }
     }
 
     /**
@@ -96,26 +108,30 @@ public class AccessibilitySampleService extends AccessibilityService {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                List<AccessibilityNodeInfo> accessibilityNodeInfoList1 = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/dba");
-                for (int i = 0; i < accessibilityNodeInfoList1.size(); i++) {
-                    AccessibilityNodeInfo accessibilityNodeInfo = accessibilityNodeInfoList1.get(i);
-                    if (accessibilityNodeInfo != null) {
-                        if (accessibilityNodeInfo.isFocusable() && accessibilityNodeInfo.isClickable() && accessibilityNodeInfo.isEnabled()) {
-                            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                if (accessibilityNodeInfo == null) {
+                    return;
+                }
+
+                List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByText("添加照片按钮");
+                if (accessibilityNodeInfoList == null || accessibilityNodeInfoList.size() == 0) {
+                    return;
+                }
+
+                AccessibilityNodeInfo tempInfo=accessibilityNodeInfoList.get(0).getParent().getParent().getParent().getChild(0);
+                if (tempInfo.isEnabled() && tempInfo.isClickable() && tempInfo.isFocusable()) {
+                                                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                             ClipData clip = ClipData.newPlainText("text", contentStr);
                             if (clipboard == null) {
                                 return;
                             }
                             clipboard.setPrimaryClip(clip);
-                            accessibilityNodeInfo.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
-                            accessibilityNodeInfo.performAction(AccessibilityNodeInfo.ACTION_PASTE);
+                            tempInfo.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
+                            tempInfo.performAction(AccessibilityNodeInfo.ACTION_PASTE);
 
                             List<AccessibilityNodeInfo> list = accessibilityNodeInfo.findAccessibilityNodeInfosByText("发送");//点击发送按钮
                             if (performClickBtn(list)) {
                                 flag = true;//标记为已发送
                             }
-                        }
-                    }
                 }
             }
         }, TEMP);
@@ -138,9 +154,7 @@ public class AccessibilitySampleService extends AccessibilityService {
             }
         }
         return false;
-//        LogUtil.e("发送朋友圈失败");
     }
-
 
     /**
      * 选择图片
@@ -155,19 +169,25 @@ public class AccessibilitySampleService extends AccessibilityService {
                 if (accessibilityNodeInfo == null) {
                     return;
                 }
-                List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/cyh");
-                if (accessibilityNodeInfoList == null) {
+
+                List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByText("预览");
+                if (accessibilityNodeInfoList == null ||
+                        accessibilityNodeInfoList.size() == 0 ||
+                            accessibilityNodeInfoList.get(0).getParent()==null||
+                                accessibilityNodeInfoList.get(0).getParent().getChildCount()==0) {
                     return;
                 }
-                for (int i = 0; i < accessibilityNodeInfoList.size(); i++) {
+                AccessibilityNodeInfo tempInfo=accessibilityNodeInfoList.get(0).getParent().getChild(3);
                     for (int j = startPicIndex; j < startPicIndex + picCount; j++) {
-                        AccessibilityNodeInfo childNodeInfo = accessibilityNodeInfoList.get(i).getChild(j);
+                        AccessibilityNodeInfo childNodeInfo = tempInfo.getChild(j);
                         if (childNodeInfo != null) {
-                            List<AccessibilityNodeInfo> childNodeInfoList = childNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/bnl");
-                            performClickBtn(childNodeInfoList);
+                            for (int k = 0; k < childNodeInfo.getChildCount(); k++) {
+                                if (childNodeInfo.getChild(k).isEnabled() && childNodeInfo.getChild(k).isClickable()) {
+                                    childNodeInfo.getChild(k).performAction(AccessibilityNodeInfo.ACTION_CLICK);//选中图片
+                                }
+                            }
                         }
                     }
-                }
 
                 List<AccessibilityNodeInfo> finishList = accessibilityNodeInfo.findAccessibilityNodeInfosByText("完成(" + picCount + "/9)");//点击确定
                 performClickBtn(finishList);
@@ -188,6 +208,7 @@ public class AccessibilitySampleService extends AccessibilityService {
                 }
 
                 List<AccessibilityNodeInfo> accessibilityNodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByText("更多功能按钮");
+//                accessibilityNodeInfoList.get(0).get
                 performClickBtn(accessibilityNodeInfoList);
                 openAlbum();
             }
