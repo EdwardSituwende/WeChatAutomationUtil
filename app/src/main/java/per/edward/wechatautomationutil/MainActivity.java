@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         int index = Integer.valueOf(editIndex.getText().toString());
         int count = Integer.valueOf(editCount.getText().toString());
 
-        SharedPreferences sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_MULTI_PROCESS);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(Constant.CONTENT, edit.getText().toString());
         editor.putInt(Constant.INDEX, index);
