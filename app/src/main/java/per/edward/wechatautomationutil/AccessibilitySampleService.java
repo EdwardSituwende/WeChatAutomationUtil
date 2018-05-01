@@ -74,7 +74,6 @@ public class AccessibilitySampleService extends AccessibilityService {
                         }
                     }, TEMP);
                 }
-
                 break;
         }
     }

@@ -32,11 +32,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void initView() {
         edit = findViewById(R.id.edit);
-        editIndex = findViewById(R.id.edit_index);
-        editCount = findViewById(R.id.edit_count);
+        editIndex = findViewById(R.id.et_index);
+        editCount = findViewById(R.id.et_count);
 
         findViewById(R.id.open_accessibility_setting).setOnClickListener(clickListener);
-        findViewById(R.id.btn_save).setOnClickListener(clickListener);
+        findViewById(R.id.btn_immediately_send).setOnClickListener(clickListener);
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.open_accessibility_setting:
                     OpenAccessibilitySettingHelper.jumpToSettingPage(getBaseContext());
                     break;
-                case R.id.btn_save:
+                case R.id.btn_immediately_send:
                     saveData();
                     break;
             }
