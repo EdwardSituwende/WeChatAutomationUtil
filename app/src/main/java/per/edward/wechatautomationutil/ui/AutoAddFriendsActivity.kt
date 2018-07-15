@@ -21,11 +21,15 @@ class AutoAddFriendsActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btn_sure).setOnClickListener {
             getNumber(et)
         }
+
+        findViewById<Button>(R.id.open_accessibility_setting).setOnClickListener {
+            AccessibilityOpenHelperActivity.jumpToSettingPage(baseContext)
+        }
     }
 
    private fun getNumber(et: EditText) {
         var list=et.text.split("\n")
-        Toast.makeText(baseContext, list[1],Toast.LENGTH_SHORT).show()
+//        Toast.makeText(baseContext, list[1],Toast.LENGTH_SHORT).show()
 
        WxUtils.openWx(this)//打开微信
     }

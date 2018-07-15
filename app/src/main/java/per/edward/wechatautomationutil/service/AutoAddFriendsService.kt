@@ -1,101 +1,150 @@
 package per.edward.wechatautomationutil.service
 
 import android.accessibilityservice.AccessibilityService
-import android.app.Activity
 import android.os.Handler
 import android.view.accessibility.AccessibilityEvent
-import per.edward.wechatautomationutil.utils.Constant
+import android.view.accessibility.AccessibilityNodeInfo
 import per.edward.wechatautomationutil.utils.LogUtil
+import java.util.ArrayList
 
 class AutoAddFriendsService : AccessibilityService() {
     override fun onInterrupt() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    private val TEMP = 2000
+    private  var accessibilityNodeInfo: AccessibilityNodeInfo?=null
+    private var stepOne=false
+    private var stepTwo=false
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-//        val sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_MULTI_PROCESS)
+        accessibilityNodeInfo = rootInActiveWindow
         val eventType = event!!.eventType
-        LogUtil.e(eventType.toString() + "             " + Integer.toHexString(eventType) + "         " + event.getClassName())
-//        accessibilityNodeInfo = rootInActiveWindow
-//        when (eventType) {
-//            AccessibilityEvent.TYPE_VIEW_SCROLLED -> if (!flag && event.getClassName() == "android.widget.ListView") {
-//                clickCircleOfFriendsBtn()//点击发送朋友圈按钮
-//            }
-//            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
-//
-//                if (event.getClassName() == "com.tencent.mm.ui.LauncherUI") {//第一次启动app
-//                    flag = false
-//                    jumpToCircleOfFriends()//进入朋友圈页面
-//                }
-//
-//                if (!flag && event.getClassName() == "com.tencent.mm.plugin.sns.ui.SnsUploadUI") {
-//                    val content = sharedPreferences!!.getString(Constant.CONTENT, "")
-//                    inputContentFinish(content)//写入要发送的朋友圈内容
-//                }
-//
-//                if (!flag && event.getClassName() == "com.tencent.mm.plugin.gallery.ui.AlbumPreviewUI") {
-//                    Handler().postDelayed({
-//                        if (sharedPreferences != null) {
-//                            val index = sharedPreferences.getInt(Constant.INDEX, 0)
-//                            val count = sharedPreferences.getInt(Constant.COUNT, 0)
-//                            choosePicture(index, count)
-//                        }
-//                    }, TEMP.toLong())
-//                }
-//            }
-//        }
+        var classNameStr=event.className
+        LogUtil.e(eventType.toString() + "             " + Integer.toHexString(eventType) + "         " + event.className)
+        if (classNameStr == "com.tencent.mm.ui.LauncherUI") {
+            clickRightMore()
+        }else if (stepOne&&classNameStr == "android.widget.ListView") {
+            clickAddFriendsButton()
+        }else if (stepTwo&&classNameStr == "com.tencent.mm.plugin.subapp.ui.pluginapp.AddMoreFriendsUI") {
+            clickSearchFriends()
+        }else if (classNameStr == "com.tencent.mm.plugin.fts.ui.FTSAddFriendUI") {
+
+        }else if (classNameStr == "android.widget.EditText") {
+
+        }else if (classNameStr == "com.tencent.mm.plugin.profile.ui.ContactInfoUI") {
+
+        }else if (classNameStr == "com.tencent.mm.plugin.profile.ui.SayHiWithSnsPermissionUI") {
+
+        }
+    }
+
+    /**
+     * @param step
+     */
+    private fun checkStep(step: Int):Boolean {
+        for (i in 0..1) {
+            val booleans = ArrayList<Boolean>()
+            booleans.add(true)
+            return false
+        }
+        return true
     }
 
     /**
      * 点击微信右上角更多
      */
-    fun clickRightMore() {
-
+    private fun clickRightMore() {
+        val list = accessibilityNodeInfo?.findAccessibilityNodeInfosByText("更多功能按钮")//微信6.6.6版本修改为发表
+        stepOne=performClickBtn(list)
     }
 
     /**
      * 点击添加好友选项
      */
-    fun clickAddFriends() {
-
+    private fun clickAddFriendsButton() {
+        var ac= accessibilityNodeInfo?.getChild(0)
+        if (ac != null && ac.childCount > 2) {
+            stepTwo=performClickBtn(ac.getChild(1))
+            stepOne=!stepTwo
+        }
     }
 
     /**
      * 点击搜索好友
      */
-    fun clickSearchFriends() {
-
+    private fun clickSearchFriends() {
+        Handler().postDelayed({
+            val ac = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("android:id/list")//微信6.6.7版本修改为发表
+            if (ac != null && ac.size!=0) {
+                var temp=ac[0]
+                if (temp != null && temp.childCount > 2) {
+                    stepTwo=performClickBtn(temp.getChild(1))
+                }
+            }
+        }, TEMP.toLong())
     }
 
     /**
      * 复制好友微信号
      */
     fun pasteFriendsNumber() {
-
+//32             20         com.tencent.mm.plugin.fts.ui.FTSAddFriendUI
     }
 
     /**
      * 开始搜索好友
      */
     fun startSearchFriends() {
-
+//16             10         android.widget.EditText
     }
 
     /**
      * 添加好友到联系人列表
      */
     fun addToContacts() {
-
+//32             20         com.tencent.mm.plugin.profile.ui.ContactInfoUI
     }
 
     /**
      * 发送完成
      */
     fun sendFinish() {
+//32             20         com.tencent.mm.plugin.profile.ui.SayHiWithSnsPermissionUI
+    }
+
+    /**
+     * 返回搜索页面
+     */
+    fun gobackSearch() {
 
     }
 
+    /**
+     * @param accessibilityNodeInfoList
+     * @return
+     */
+    private fun performClickBtn(accessibilityNodeInfoList: List<AccessibilityNodeInfo>?): Boolean {
+        if (accessibilityNodeInfoList != null && accessibilityNodeInfoList.size != 0) {
+            for (i in accessibilityNodeInfoList.indices) {
+                val accessibilityNodeInfo = accessibilityNodeInfoList[i]
+                if (accessibilityNodeInfo != null) {
+                    if (accessibilityNodeInfo.isClickable && accessibilityNodeInfo.isEnabled) {
+                        accessibilityNodeInfo.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
 
+    private fun performClickBtn(accessibilityNodeInfo: AccessibilityNodeInfo): Boolean {
+        if (accessibilityNodeInfo.isClickable && accessibilityNodeInfo.isEnabled) {
+            accessibilityNodeInfo.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+            return true
+        }
+        return false
+    }
 }
 
 

@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import per.edward.wechatautomationutil.utils.Constant;
@@ -162,6 +163,7 @@ public class AccessibilitySampleService extends AccessibilityService {
         }, TEMP);
     }
 
+
     /**
      * @param accessibilityNodeInfoList
      * @return
@@ -178,6 +180,16 @@ public class AccessibilitySampleService extends AccessibilityService {
                 }
             }
         }
+        return false;
+    }
+
+    private boolean performClickBtn(AccessibilityNodeInfo accessibilityNodeInfo) {
+        if (accessibilityNodeInfo.isClickable() && accessibilityNodeInfo.isEnabled()) {
+            accessibilityNodeInfo.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+            return true;
+        }
+        List<Boolean> booleans = new ArrayList<>();
+        booleans.add(true);
         return false;
     }
 

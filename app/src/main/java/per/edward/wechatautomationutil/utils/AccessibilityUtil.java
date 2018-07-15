@@ -6,13 +6,15 @@ import android.provider.Settings;
 import android.text.TextUtils;
 
 import per.edward.wechatautomationutil.service.AccessibilitySampleService;
+import per.edward.wechatautomationutil.service.AutoAddFriendsService;
 
 
 /**
  * 辅助功能相关检查的帮助类
  */
 public class AccessibilityUtil {
-    private static final String ACCESSIBILITY_SERVICE_PATH = AccessibilitySampleService.class.getCanonicalName();
+//    private static final String ACCESSIBILITY_SERVICE_PATH = AccessibilitySampleService.class.getCanonicalName();
+    private static final String ACCESSIBILITY_SERVICE_PATH = AutoAddFriendsService.class.getCanonicalName();
     /**
      * 判断是否有辅助功能权限
      *
