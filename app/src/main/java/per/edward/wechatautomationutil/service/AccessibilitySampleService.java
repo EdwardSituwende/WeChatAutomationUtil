@@ -1,4 +1,4 @@
-package per.edward.wechatautomationutil;
+package per.edward.wechatautomationutil.service;
 
 import android.accessibilityservice.AccessibilityService;
 import android.annotation.TargetApi;
@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.util.Log;
@@ -278,6 +279,7 @@ public class AccessibilitySampleService extends AccessibilityService {
     public void onInterrupt() {
 
     }
+
 
 
     /**

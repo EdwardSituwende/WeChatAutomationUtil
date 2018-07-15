@@ -1,6 +1,7 @@
-package per.edward.wechatautomationutil;
+package per.edward.wechatautomationutil.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import per.edward.wechatautomationutil.R;
 import per.edward.wechatautomationutil.utils.AccessibilityUtil;
 
 
@@ -31,6 +33,17 @@ public class AccessibilityOpenHelperActivity extends Activity {
     private long TIMER_CHECK_INTERVAL = 1000;
     protected static Handler mHandle = new Handler();
     protected static Runnable tipToastDelayRunnable;
+
+    private static final String ACTION_START_ACCESSIBILITY_SETTING = "action_start_accessibility_setting";
+
+    public static void jumpToSettingPage(Context context) {
+        try {
+            Intent intent = new Intent(context,  AccessibilityOpenHelperActivity.class);
+            intent.putExtra(ACTION, ACTION_START_ACCESSIBILITY_SETTING);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        } catch (Exception ignore) {}
+    }
 
     private static void removeDelayedToastTask() {
         if (mHandle != null && tipToastDelayRunnable != null) {

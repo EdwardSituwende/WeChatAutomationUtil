@@ -1,9 +1,7 @@
-package per.edward.wechatautomationutil;
+package per.edward.wechatautomationutil.ui;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -11,22 +9,25 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import per.edward.wechatautomationutil.R;
 import per.edward.wechatautomationutil.utils.Constant;
+import per.edward.wechatautomationutil.utils.WxUtils;
 
 /**
+ * 发送朋友圈页
  * 注意事项
  * 1、Android设备必须安装微信app
  * 2、Android Sdk Version
  * <p>
  * Created by Edward on 2018-03-15.
  */
-public class MainActivity extends AppCompatActivity {
+public class AutoSendCircleOfFriendsActivity extends AppCompatActivity {
     EditText edit, editIndex, editCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_auto_send_circle_of_friends);
         initView();
     }
 
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.open_accessibility_setting:
-                    OpenAccessibilitySettingHelper.jumpToSettingPage(getBaseContext());
+                    AccessibilityOpenHelperActivity.jumpToSettingPage(getBaseContext());
                     break;
                 case R.id.btn_save:
                     saveData();
@@ -94,8 +95,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openWeChatApplication() {
-        PackageManager packageManager = getBaseContext().getPackageManager();
-        Intent it = packageManager.getLaunchIntentForPackage("com.tencent.mm");
-        startActivity(it);
+        WxUtils.Companion.openWx(this);
     }
 }

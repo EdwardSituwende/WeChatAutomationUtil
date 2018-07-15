@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.provider.Settings;
 import android.text.TextUtils;
 
-import per.edward.wechatautomationutil.AccessibilitySampleService;
+import per.edward.wechatautomationutil.service.AccessibilitySampleService;
 
 
 /**

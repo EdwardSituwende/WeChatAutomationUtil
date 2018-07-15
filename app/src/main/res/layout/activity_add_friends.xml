@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/open_accessibility_setting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="打开辅助功能开关"/>
+
+    <TextView
+        android:id="@+id/tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        app:layout_constraintTop_toBottomOf="@id/open_accessibility_setting"
+        android:text="特别注意：仅支持微信6.6.7版本" />
+
+    <EditText
+        android:id="@+id/et"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="top|left"
+        android:hint="输入微信号"
+        app:layout_constraintTop_toBottomOf="@+id/tv"
+        app:layout_constraintBottom_toTopOf="@+id/btn_sure"
+        android:text="张三\n李四\n王二"/>
+
+    <Button
+        android:id="@+id/btn_sure"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="确定" />
+</android.support.constraint.ConstraintLayout>

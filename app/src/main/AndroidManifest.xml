@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,14 +22,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AccessibilityOpenHelperActivity"
+            android:name=".ui.AccessibilityOpenHelperActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
             android:process=":BackgroundService"
             android:taskAffinity="com.open.helper"
             android:theme="@style/Accessibility.Transparent.Activity" />
+        <activity android:name=".ui.AutoSendCircleOfFriendsActivity" />
+        <activity android:name=".ui.AutoAddFriendsActivity" />
 
-        <service android:name=".AccessibilitySampleService"
+        <service android:name=".service.AccessibilitySampleService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             android:process=":BackgroundService">
             <intent-filter>
