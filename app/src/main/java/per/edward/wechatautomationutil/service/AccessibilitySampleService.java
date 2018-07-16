@@ -302,6 +302,7 @@ public class AccessibilitySampleService extends AccessibilityService {
      */
     @Override
     public void onDestroy() {
+
         super.onDestroy();
         LogUtil.e("服务被杀死!");
     }
