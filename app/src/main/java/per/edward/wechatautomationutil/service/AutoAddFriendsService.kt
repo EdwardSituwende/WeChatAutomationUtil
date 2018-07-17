@@ -1,9 +1,13 @@
 package per.edward.wechatautomationutil.service
 
 import android.accessibilityservice.AccessibilityService
+import android.app.Activity
 import android.os.Handler
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import android.widget.Toast
+import per.edward.wechatautomationutil.ui.AutoAddFriendsActivity
+import per.edward.wechatautomationutil.utils.Constant
 import per.edward.wechatautomationutil.utils.LogUtil
 import per.edward.wechatautomationutil.utils.OperationUtils
 import java.util.ArrayList
@@ -14,40 +18,41 @@ class AutoAddFriendsService : AccessibilityService() {
     }
 
     private val TEMP = 2000
-    private  var accessibilityNodeInfo: AccessibilityNodeInfo?=null
-    private var stepOne=false
-    private var stepTwo=false
-    private var stepThree=false
-    private var stepFour=false
-    private var sendFinish=false
+    private var accessibilityNodeInfo: AccessibilityNodeInfo? = null
+    private var stepOne = false
+    private var stepTwo = false
+    private var stepThree = false
+    private var stepFour = false
+    private var sendFinish = false
+    private var listNumber = ArrayList<String>()
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         accessibilityNodeInfo = rootInActiveWindow
         val eventType = event!!.eventType
-        var classNameStr=event.className
+        var classNameStr = event.className
         LogUtil.e(eventType.toString() + "             " + Integer.toHexString(eventType) + "         " + event.className)
-        if (classNameStr == "com.tencent.mm.ui.LauncherUI") {
-            clickRightMore()
-        }else if (stepOne&&classNameStr == "android.widget.ListView") {
-            clickAddFriendsButton()
-        }else if (stepTwo&&classNameStr == "android.widget.FrameLayout") {
-            clickSearchFriends()
-        }else if (classNameStr == "com.tencent.mm.plugin.fts.ui.FTSAddFriendUI") {
-            pasteFriendsNumber()
-        }else if (eventType.toString()=="4096") {
-            startSearchFriends()
-        }else if (!sendFinish&&classNameStr == "com.tencent.mm.plugin.profile.ui.ContactInfoUI") {
+//        if (classNameStr == "com.tencent.mm.ui.LauncherUI") {
+//            clickRightMore()
+//        } else if (stepOne && classNameStr == "android.widget.ListView") {
+//            clickAddFriendsButton()
+//        } else
+        if (classNameStr == "com.tencent.mm.plugin.subapp.ui.pluginapp.AddMoreFriendsUI") {
+            i = 0
+            val sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_MULTI_PROCESS)
+            var contentStr = sharedPreferences.getString("content", "")
+            listNumber = contentStr.split("\n") as ArrayList<String>
+        } else if (classNameStr == "com.tencent.mm.plugin.fts.ui.FTSAddFriendUI") {
+            clearPasteFriendsNumber()
+        } else if (classNameStr == "com.tencent.mm.plugin.profile.ui.ContactInfoUI") {
             addToContacts()
-        }else if (classNameStr == "com.tencent.mm.plugin.profile.ui.SayHiWithSnsPermissionUI") {
+        } else if (classNameStr == "com.tencent.mm.plugin.profile.ui.SayHiWithSnsPermissionUI") {
             sendFinish()
-        }else if (sendFinish&&classNameStr == "com.tencent.mm.plugin.profile.ui.ContactInfoUI") {//回到联系人页面点返回
-            goBackSearch()
         }
     }
 
     /**
      * @param step
      */
-    private fun checkStep(step: Int):Boolean {
+    private fun checkStep(step: Int): Boolean {
         for (i in 0..1) {
             val booleans = ArrayList<Boolean>()
             booleans.add(true)
@@ -61,17 +66,17 @@ class AutoAddFriendsService : AccessibilityService() {
      */
     private fun clickRightMore() {
         val list = accessibilityNodeInfo?.findAccessibilityNodeInfosByText("更多功能按钮")//微信6.6.6版本修改为发表
-        stepOne=OperationUtils.performClickBtn(list)
+        stepOne = OperationUtils.performClickBtn(list)
     }
 
     /**
      * 点击添加好友选项
      */
     private fun clickAddFriendsButton() {
-        var ac= accessibilityNodeInfo?.getChild(0)
+        var ac = accessibilityNodeInfo?.getChild(0)
         if (ac != null && ac.childCount > 2) {
-            stepTwo=OperationUtils.performClickBtn(ac.getChild(1))
-            stepOne=!stepTwo
+            stepTwo = OperationUtils.performClickBtn(ac.getChild(1))
+            stepOne = !stepTwo
         }
     }
 
@@ -79,39 +84,59 @@ class AutoAddFriendsService : AccessibilityService() {
      * 点击搜索好友
      */
     private fun clickSearchFriends() {
-//        Handler().postDelayed({
-//            val ac = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/j2")//微信6.6.7版本修改为发表
-//            if (ac != null && ac.size!=0) {
-//                var temp=ac[0]
-//                if (temp != null && temp.childCount > 2) {
+        Handler().postDelayed({
+            val ac = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/j2")//微信6.6.7版本修改为发表
+            if (ac != null && ac.size != 0) {
+                var temp = ac[0].parent
+                if (temp != null) {
 //                    LogUtil.e(temp.getChild(1).childCount.toString())
-////                    stepTwo=performClickBtn(temp.getChild(1))
-//                }
-//            }
-//        }, TEMP.toLong())
+                    stepTwo = OperationUtils.performClickBtn(temp)
+                }
+            }
+        }, TEMP.toLong())
     }
 
+    private fun clearPasteFriendsNumber() {//com.tencent.mm.plugin.fts.ui.FTSAddFriendUI
+        if (!stepThree) {
+            Handler().postDelayed({
+                stepThree = true
+                val list1 = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/hv")//点击清除微信号文本按钮
+                if (list1 != null && list1.size != 0) {
+                    OperationUtils.performClickBtn(list1[0])
+                }
+                pasteFriendsNumber()
+            }, TEMP.toLong())
+        }
+    }
+
+    var i: Int = 0
     /**
      * 复制好友微信号
      */
     private fun pasteFriendsNumber() {
-//32             20         com.tencent.mm.plugin.fts.ui.FTSAddFriendUI
-        Handler().postDelayed({
-            val list = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/hz")
-            if (list != null && list.size != 0) {
-                OperationUtils.pasteContent(this,list[0],"13427561170")
-            }
-        }, TEMP.toLong())
+        if (i < listNumber.size) {
+            Handler().postDelayed({
+                val list = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/hz")
+                if (list != null && list.size != 0) {
+                    var temp = OperationUtils.pasteContent(this, list[0], listNumber[i++])
+                    if (temp) {
+                        goSearchFriends()
+                    }
+                }
+            }, TEMP.toLong())
+        } else {
+            Toast.makeText(baseContext, "已添加" + listNumber.size + "个好友，好友添加完毕！", Toast.LENGTH_LONG).show()
+        }
     }
 
     /**
      * 开始搜索好友
      */
-    private fun startSearchFriends() {
+    private fun goSearchFriends() {
         Handler().postDelayed({
             val ac = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/bcq")
-            if (ac != null && ac.size!=0) {
-                var ac1= ac[0]
+            if (ac != null && ac.size != 0) {
+                var ac1 = ac[0]
                 if (ac1 != null && ac1.childCount != 0) {
                     OperationUtils.performClickBtn(ac1.getChild(0))
                 }
@@ -123,12 +148,16 @@ class AutoAddFriendsService : AccessibilityService() {
      * 添加好友到联系人列表
      */
     private fun addToContacts() {
-        Handler().postDelayed({
-            val ac = accessibilityNodeInfo?.findAccessibilityNodeInfosByText("添加到通讯录")
-            if (ac != null && ac.size != 0) {
-                OperationUtils.performClickBtn(ac[0])
-            }
-        }, TEMP.toLong())
+        if (sendFinish) {
+            goBackSearch()
+        } else {
+            Handler().postDelayed({
+                val ac = accessibilityNodeInfo?.findAccessibilityNodeInfosByText("添加到通讯录")
+                if (ac != null && ac.size != 0) {
+                    OperationUtils.performClickBtn(ac[0])
+                }
+            }, TEMP.toLong())
+        }
     }
 
     /**
@@ -138,7 +167,7 @@ class AutoAddFriendsService : AccessibilityService() {
         Handler().postDelayed({
             val ac = accessibilityNodeInfo?.findAccessibilityNodeInfosByText("发送")
             if (ac != null && ac.size != 0) {
-                sendFinish=OperationUtils.performClickBtn(ac[1])
+                sendFinish = OperationUtils.performClickBtn(ac[1])
             }
         }, TEMP.toLong())
     }
@@ -147,10 +176,11 @@ class AutoAddFriendsService : AccessibilityService() {
      * 返回搜索页面
      */
     private fun goBackSearch() {
-        sendFinish=false
+        stepThree = false
+        sendFinish = false
         Handler().postDelayed({
             val ac = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/hs")
-            if (ac != null && ac.size!=0) {
+            if (ac != null && ac.size != 0) {
                 OperationUtils.performClickBtn(ac)
             }
         }, TEMP.toLong())

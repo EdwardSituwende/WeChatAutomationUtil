@@ -25,7 +25,7 @@ import per.edward.wechatautomationutil.utils.LogUtil;
 @TargetApi(18)
 public class AccessibilitySampleService extends AccessibilityService {
     private final int TEMP = 2000;
-
+//    public static List<String> list = new ArrayList<>();
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
