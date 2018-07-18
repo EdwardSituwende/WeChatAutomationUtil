@@ -33,6 +33,12 @@ class AutoAddFriendsActivity : AppCompatActivity() {
 
 
     private fun getNumber(et: EditText) {
+        var numberStr = et.text.toString()
+        var list1 = numberStr.split("\n")
+        if (list1.size > 15) {
+            Toast.makeText(baseContext, "最多只能添加15个微信号！", Toast.LENGTH_LONG).show()
+            return
+        }
         val sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_MULTI_PROCESS)
         val editor = sharedPreferences.edit()
         editor.putString("content", et.text.toString())
