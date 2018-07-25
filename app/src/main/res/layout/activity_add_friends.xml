@@ -28,7 +28,7 @@
         android:layout_above="@+id/btn_sure"
         android:gravity="top|left"
         android:hint="输入微信号"
-        android:text=""/>
+        android:text="helloworld123\nhelloworld12345"/>
 
     <Button
         android:id="@+id/btn_sure"

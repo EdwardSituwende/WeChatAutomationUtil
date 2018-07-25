@@ -49,52 +49,52 @@ class AutoAddFriendsService : AccessibilityService() {
         }
     }
 
-    /**
-     * @param step
-     */
-    private fun checkStep(step: Int): Boolean {
-        for (i in 0..1) {
-            val booleans = ArrayList<Boolean>()
-            booleans.add(true)
-            return false
-        }
-        return true
-    }
-
-    /**
-     * 点击微信右上角更多
-     */
-    private fun clickRightMore() {
-        val list = accessibilityNodeInfo?.findAccessibilityNodeInfosByText("更多功能按钮")//微信6.6.6版本修改为发表
-        stepOne = OperationUtils.performClickBtn(list)
-    }
-
-    /**
-     * 点击添加好友选项
-     */
-    private fun clickAddFriendsButton() {
-        var ac = accessibilityNodeInfo?.getChild(0)
-        if (ac != null && ac.childCount > 2) {
-            stepTwo = OperationUtils.performClickBtn(ac.getChild(1))
-            stepOne = !stepTwo
-        }
-    }
-
-    /**
-     * 点击搜索好友
-     */
-    private fun clickSearchFriends() {
-        Handler().postDelayed({
-            val ac = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/j2")//微信6.6.7版本修改为发表
-            if (ac != null && ac.size != 0) {
-                var temp = ac[0].parent
-                if (temp != null) {
-//                    LogUtil.e(temp.getChild(1).childCount.toString())
-                    stepTwo = OperationUtils.performClickBtn(temp)
-                }
-            }
-        }, TEMP.toLong())
-    }
+//    /**
+//     * @param step
+//     */
+//    private fun checkStep(step: Int): Boolean {
+//        for (i in 0..1) {
+//            val booleans = ArrayList<Boolean>()
+//            booleans.add(true)
+//            return false
+//        }
+//        return true
+//    }
+//
+//    /**
+//     * 点击微信右上角更多
+//     */
+//    private fun clickRightMore() {
+//        val list = accessibilityNodeInfo?.findAccessibilityNodeInfosByText("更多功能按钮")//微信6.6.6版本修改为发表
+//        stepOne = OperationUtils.performClickBtn(list)
+//    }
+//
+//    /**
+//     * 点击添加好友选项
+//     */
+//    private fun clickAddFriendsButton() {
+//        var ac = accessibilityNodeInfo?.getChild(0)
+//        if (ac != null && ac.childCount > 2) {
+//            stepTwo = OperationUtils.performClickBtn(ac.getChild(1))
+//            stepOne = !stepTwo
+//        }
+//    }
+//
+//    /**
+//     * 点击搜索好友
+//     */
+//    private fun clickSearchFriends() {
+//        Handler().postDelayed({
+//            val ac = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/j2")//微信6.6.7版本修改为发表
+//            if (ac != null && ac.size != 0) {
+//                var temp = ac[0].parent
+//                if (temp != null) {
+////                    LogUtil.e(temp.getChild(1).childCount.toString())
+//                    stepTwo = OperationUtils.performClickBtn(temp)
+//                }
+//            }
+//        }, TEMP.toLong())
+//    }
 
     private fun clearPasteFriendsNumber() {//com.tencent.mm.plugin.fts.ui.FTSAddFriendUI
         if (!stepThree) {
