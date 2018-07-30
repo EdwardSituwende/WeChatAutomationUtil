@@ -67,10 +67,10 @@ class AutoAddFriendsService : AccessibilityService() {
         } else if (classNameStr == "com.tencent.mm.plugin.profile.ui.SayHiWithSnsPermissionUI") {
             sendFinish()
         }else if (eventType.toString() == "1" && classNameStr == "android.widget.RelativeLayout") {//查找不到用户的情况
-            stepThree=false
-            clearPasteFriendsNumber()
+//            stepThree=false
+//            clearPasteFriendsNumber()
 
-//            clearText()
+            clearText()
         }
     }
 
@@ -79,13 +79,12 @@ class AutoAddFriendsService : AccessibilityService() {
 //    /**
 //     */
     private fun clearText(){
-        Handler().postDelayed({
-            val list = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/hx")
-//            var  clearList = temp?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/hv")//点击清除微信号文本按钮
-//            if (clearList != null && clearList.size != 0) {
-                OperationUtils.performClickBtn(list)
-//            }
-        }, TEMP.toLong())
+    if (pasteList != null && pasteList?.size != 0) {
+        var temp = OperationUtils.pasteContent(this, pasteList!![0], listNumber[i++])
+        if (temp) {
+            goSearchFriends()
+        }
+    }
     }
 //
 //    /**
@@ -123,18 +122,17 @@ class AutoAddFriendsService : AccessibilityService() {
 //        }, TEMP.toLong())
 //    }
     companion object {
-        var clearList:List<AccessibilityNodeInfo>?=null
+//        var clearList:List<AccessibilityNodeInfo>?=null
+        var pasteList:List<AccessibilityNodeInfo>?=null
     }
 
     private fun clearPasteFriendsNumber() {//com.tencent.mm.plugin.fts.ui.FTSAddFriendUI
         if (!stepThree) {
             Handler().postDelayed({
                 stepThree = true
-                if (clearList == null) {
-                    clearList = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/hv")//点击清除微信号文本按钮
-                }
-                if (clearList != null && clearList?.size != 0) {
-                    OperationUtils.performClickBtn(clearList!![0])
+                var  clearList = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/hv")//点击清除微信号文本按钮
+                if (clearList != null && clearList.size != 0) {
+                    OperationUtils.performClickBtn(clearList[0])
                 }
                 pasteFriendsNumber()
             }, TEMP.toLong())
@@ -149,13 +147,12 @@ class AutoAddFriendsService : AccessibilityService() {
     private fun pasteFriendsNumber() {
         if (i < listNumber.size) {
             Handler().postDelayed({
-                val list = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/hz")
-                if (list != null && list.size != 0) {
-                    var temp = OperationUtils.pasteContent(this, list[0], listNumber[i++])
+                if (pasteList == null) {
+                    pasteList = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/hz")
+                }
+                if (pasteList != null && pasteList?.size != 0) {
+                    var temp = OperationUtils.pasteContent(this, pasteList!![0], listNumber[i++])
                     if (temp) {
-                        if ((clearList!=null && clearList?.size==0)||clearList == null) {
-                            clearList = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/hv")//点击清除微信号文本按钮
-                        }
                         goSearchFriends()
                     }
                 }

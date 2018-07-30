@@ -37,6 +37,32 @@ class OperationUtils {
         }
 
         /**
+         * 粘贴文本
+         *
+         * @param tempInfo
+         * @param contentStr
+         * @return true 粘贴成功，false 失败
+         */
+        fun pasteContent1(accessibilityService: AccessibilityService, tempInfo: AccessibilityNodeInfo?, contentStr: String): Boolean {
+            if (tempInfo == null) {
+                return false
+            }
+            if (tempInfo.isEnabled && tempInfo.isClickable && tempInfo.isFocusable) {
+//                val clipboard = accessibilityService.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+//                val clip = ClipData.newPlainText("text", contentStr)
+//                if (clipboard == null) {
+//                    return false
+//                }
+//                clipboard.primaryClip = clip
+                tempInfo.performAction(AccessibilityNodeInfo.ACTION_FOCUS)
+                tempInfo.performAction(AccessibilityNodeInfo.ACTION_SELECT)
+                tempInfo.performAction(AccessibilityNodeInfo.ACTION_CUT)
+                return true
+            }
+            return false
+        }
+
+        /**
          * @param accessibilityNodeInfoList
          * @return
          */

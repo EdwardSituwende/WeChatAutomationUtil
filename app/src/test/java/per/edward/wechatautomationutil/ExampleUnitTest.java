@@ -2,6 +2,9 @@ package per.edward.wechatautomationutil;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 /**
@@ -12,6 +15,23 @@ import static org.junit.Assert.*;
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() throws Exception {
-        assertEquals(4, 2 + 2);
+
+        readData("helloworld123\n哈哈\nhelloworld12345");
     }
+
+    private void readData(String temp) {
+        List<String> list = new ArrayList<String>();
+        //        String[] listData = temp.split("\n");
+        list.add("测1试");
+        list.add("测2试");
+        list.add("测3试");
+        list.set(1,list.get(1)+ "123");
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i));
+        }
+
+//        for (int i = 0; i < list.size(); i++) {
+//        }
+    }
+
 }
