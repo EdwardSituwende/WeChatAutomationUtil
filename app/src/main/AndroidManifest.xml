@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.INJECT_EVENTS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -31,16 +33,16 @@
         <activity android:name=".ui.AutoSendCircleOfFriendsActivity" />
         <activity android:name=".ui.AutoAddFriendsActivity" />
 
-        <service android:name=".service.AccessibilitySampleService"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:process=":BackgroundService">
-            <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-            </intent-filter>
-            <meta-data
-                android:name="android.accessibilityservice"
-                android:resource="@xml/accessibility_config"/>
-        </service>
+        <!--<service android:name=".service.AccessibilitySampleService"-->
+            <!--android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"-->
+            <!--android:process=":BackgroundService">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.accessibilityservice.AccessibilityService" />-->
+            <!--</intent-filter>-->
+            <!--<meta-data-->
+                <!--android:name="android.accessibilityservice"-->
+                <!--android:resource="@xml/accessibility_config"/>-->
+        <!--</service>-->
 
         <service android:name=".service.AutoAddFriendsService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"

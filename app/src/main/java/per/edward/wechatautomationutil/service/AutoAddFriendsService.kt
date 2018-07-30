@@ -2,19 +2,45 @@ package per.edward.wechatautomationutil.service
 
 import android.accessibilityservice.AccessibilityService
 import android.app.Activity
+import android.os.Environment
 import android.os.Handler
+import android.text.TextUtils
+import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Toast
 import per.edward.wechatautomationutil.ui.AutoAddFriendsActivity
 import per.edward.wechatautomationutil.utils.Constant
+import per.edward.wechatautomationutil.utils.FileUtils
 import per.edward.wechatautomationutil.utils.LogUtil
 import per.edward.wechatautomationutil.utils.OperationUtils
+import java.io.File
 import java.util.ArrayList
 
 class AutoAddFriendsService : AccessibilityService() {
+    override fun onServiceConnected() {
+        loadFile()
+    }
+
+    private fun loadFile() {
+        var list= Environment.getExternalStorageDirectory().listFiles()
+        var filePath: String? =null
+        for (i in list) {//寻找指定文件
+            if (i.name.contains("my_folder.txt")) {
+                filePath= i.path
+                break
+            }
+        }
+
+        var file = File(filePath)
+        if (file.isFile) {
+            var content= FileUtils.readTxtFile(file)
+//            Log.e("输出",content)
+            listNumber = content.split("\n") as ArrayList<String>
+        }
+    }
+
     override fun onInterrupt() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     private val TEMP = 2000
@@ -37,9 +63,9 @@ class AutoAddFriendsService : AccessibilityService() {
 //        } else
         if (classNameStr == "com.tencent.mm.plugin.subapp.ui.pluginapp.AddMoreFriendsUI") {
             i = 0
-            val sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_MULTI_PROCESS)
-            var contentStr = sharedPreferences.getString("content", "")
-            listNumber = contentStr.split("\n") as ArrayList<String>
+//            val sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_MULTI_PROCESS)
+//            var contentStr = sharedPreferences.getString("content", "")
+//            listNumber = contentStr.split("\n") as ArrayList<String>
         } else if (classNameStr == "com.tencent.mm.plugin.fts.ui.FTSAddFriendUI") {
             clearPasteFriendsNumber()
         } else if (classNameStr == "com.tencent.mm.plugin.profile.ui.ContactInfoUI") {
@@ -110,6 +136,7 @@ class AutoAddFriendsService : AccessibilityService() {
     }
 
     var i: Int = 0
+
     /**
      * 复制好友微信号
      */

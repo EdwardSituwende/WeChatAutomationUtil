@@ -11,9 +11,16 @@
         android:layout_height="wrap_content"
         android:text="打开辅助功能开关"/>
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_below="@id/open_accessibility_setting"
+        android:text="加载txt文件"
+        android:id="@+id/btn_loading_txt"
+        android:layout_height="wrap_content"/>
+
     <TextView
         android:id="@+id/tv"
-        android:layout_below="@+id/open_accessibility_setting"
+        android:layout_below="@+id/btn_loading_txt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
@@ -33,6 +40,7 @@
     <Button
         android:id="@+id/btn_sure"
         android:layout_alignParentBottom="true"
+        android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
