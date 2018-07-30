@@ -26,7 +26,7 @@ class AutoAddFriendsService : AccessibilityService() {
         var list = Environment.getExternalStorageDirectory().listFiles()
         var filePath: String? = null
         for (i in list) {//寻找指定文件
-            if (i.name.contains("my_folder.txt")) {
+            if (i.name.contains(Constant.WX_NUMBER_FILE_NAME)) {
                 filePath = i.path
                 break
             }
@@ -46,9 +46,7 @@ class AutoAddFriendsService : AccessibilityService() {
     private val TEMP = 2000
     private var accessibilityNodeInfo: AccessibilityNodeInfo? = null
     private var stepOne = false
-    private var stepTwo = false
     private var stepThree = false
-    private var stepFour = false
     private var sendFinish = false
     private var listNumber = ArrayList<String>()
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
@@ -56,44 +54,47 @@ class AutoAddFriendsService : AccessibilityService() {
         val eventType = event!!.eventType
         var classNameStr = event.className
         LogUtil.e(eventType.toString() + "             " + Integer.toHexString(eventType) + "         " + event.className)
-//        if (classNameStr == "com.tencent.mm.ui.LauncherUI") {
-//            clickRightMore()
-//        } else if (stepOne && classNameStr == "android.widget.ListView") {
-//            clickAddFriendsButton()
-//        } else
         if (classNameStr == "com.tencent.mm.plugin.subapp.ui.pluginapp.AddMoreFriendsUI") {
             i = 0
-//            val sharedPreferences = getSharedPreferences(Constant.WECHAT_STORAGE, Activity.MODE_MULTI_PROCESS)
-//            var contentStr = sharedPreferences.getString("content", "")
-//            listNumber = contentStr.split("\n") as ArrayList<String>
+            stepOne=false
+            stepThree=false
+            sendFinish=false
         } else if (classNameStr == "com.tencent.mm.plugin.fts.ui.FTSAddFriendUI") {
+//            temp=accessibilityNodeInfo
             clearPasteFriendsNumber()
-        } else if (classNameStr == "com.tencent.mm.plugin.profile.ui.ContactInfoUI") {
+        } else if (classNameStr == "com.tencent.mm.plugin.profile.ui.ContactInfoUI") {//1             1         android.widget.RelativeLayout
             addToContacts()
         } else if (classNameStr == "com.tencent.mm.plugin.profile.ui.SayHiWithSnsPermissionUI") {
             sendFinish()
+        }else if (eventType.toString() == "1" && classNameStr == "android.widget.RelativeLayout") {//查找不到用户的情况
+            stepThree=false
+            clearPasteFriendsNumber()
+
+//            clearText()
         }
     }
 
+//    var temp:AccessibilityNodeInfo? = null
+
 //    /**
-//     * @param step
 //     */
-//    private fun checkStep(step: Int): Boolean {
-//        for (i in 0..1) {
-//            val booleans = ArrayList<Boolean>()
-//            booleans.add(true)
-//            return false
-//        }
-//        return true
-//    }
+    private fun clearText(){
+        Handler().postDelayed({
+            val list = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/hx")
+//            var  clearList = temp?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/hv")//点击清除微信号文本按钮
+//            if (clearList != null && clearList.size != 0) {
+                OperationUtils.performClickBtn(list)
+//            }
+        }, TEMP.toLong())
+    }
 //
 //    /**
 //     * 点击微信右上角更多
 //     */
-//    private fun clickRightMore() {
-//        val list = accessibilityNodeInfo?.findAccessibilityNodeInfosByText("更多功能按钮")//微信6.6.6版本修改为发表
-//        stepOne = OperationUtils.performClickBtn(list)
-//    }
+    private fun modifyData() {
+        val list = accessibilityNodeInfo?.findAccessibilityNodeInfosByText("更多功能按钮")//微信6.6.6版本修改为发表
+        stepOne = OperationUtils.performClickBtn(list)
+    }
 //
 //    /**
 //     * 点击添加好友选项
@@ -121,14 +122,19 @@ class AutoAddFriendsService : AccessibilityService() {
 //            }
 //        }, TEMP.toLong())
 //    }
+    companion object {
+        var clearList:List<AccessibilityNodeInfo>?=null
+    }
 
     private fun clearPasteFriendsNumber() {//com.tencent.mm.plugin.fts.ui.FTSAddFriendUI
         if (!stepThree) {
             Handler().postDelayed({
                 stepThree = true
-                val list1 = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/hv")//点击清除微信号文本按钮
-                if (list1 != null && list1.size != 0) {
-                    OperationUtils.performClickBtn(list1[0])
+                if (clearList == null) {
+                    clearList = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/hv")//点击清除微信号文本按钮
+                }
+                if (clearList != null && clearList?.size != 0) {
+                    OperationUtils.performClickBtn(clearList!![0])
                 }
                 pasteFriendsNumber()
             }, TEMP.toLong())
@@ -147,11 +153,15 @@ class AutoAddFriendsService : AccessibilityService() {
                 if (list != null && list.size != 0) {
                     var temp = OperationUtils.pasteContent(this, list[0], listNumber[i++])
                     if (temp) {
+                        if ((clearList!=null && clearList?.size==0)||clearList == null) {
+                            clearList = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/hv")//点击清除微信号文本按钮
+                        }
                         goSearchFriends()
                     }
                 }
             }, TEMP.toLong())
         } else {
+            LogUtil.e("已添加" + listNumber.size + "个好友，好友添加完毕！")
             Toast.makeText(baseContext, "已添加" + listNumber.size + "个好友，好友添加完毕！", Toast.LENGTH_LONG).show()
         }
     }

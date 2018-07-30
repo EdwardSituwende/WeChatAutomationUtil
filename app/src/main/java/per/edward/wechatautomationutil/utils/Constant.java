@@ -15,4 +15,6 @@ public class Constant {
 
     public static final String CONTENT = "content";
 
+    public static final String WX_NUMBER_FILE_NAME = "my_folder.txt";
+
 }
