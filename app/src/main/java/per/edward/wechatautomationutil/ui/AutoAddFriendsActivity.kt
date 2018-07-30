@@ -2,7 +2,9 @@ package per.edward.wechatautomationutil.ui
 
 import android.Manifest
 import android.app.Activity
+import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.support.v7.app.AppCompatActivity
@@ -24,14 +26,14 @@ import java.util.ArrayList
  * 自动添加好友
  */
 class AutoAddFriendsActivity : AppCompatActivity() {
-    var btn:Button?=null
+    var btn: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_friends)
 
         var et = findViewById<EditText>(R.id.et)
-        btn= findViewById<Button>(R.id.btn_sure)
+        btn = findViewById<Button>(R.id.btn_sure)
         btn?.setOnClickListener {
             getNumber(et)
         }
@@ -47,45 +49,58 @@ class AutoAddFriendsActivity : AppCompatActivity() {
 
 
     private fun loadFile() {
-        requestPermission()
-        var list=Environment.getExternalStorageDirectory().listFiles()
+        requestPermission1()
+        var list = Environment.getExternalStorageDirectory().listFiles()
         if (list == null) {
-            Toast.makeText(this,"应用读写权限未开启",Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "应用读写权限未开启", Toast.LENGTH_LONG).show()
             return
         }
-        var filePath: String? =null
+        var filePath: String? = null
         for (i in list) {//寻找指定文件
             if (i.name.contains("my_folder.txt")) {
-                filePath= i.path
+                filePath = i.path
                 break
             }
         }
 
         if (filePath == null) {
-            Toast.makeText(this,"没有找my_folder.txt文件",Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "没有找my_folder.txt文件", Toast.LENGTH_LONG).show()
             return
         }
 
         var file = File(filePath)
         if (file.isFile) {
-           var content= FileUtils.readTxtFile(file)
+            var content = FileUtils.readTxtFile(file)
             if (!TextUtils.isEmpty(content)) {
-                btn?.isEnabled=true
-                Toast.makeText(this,"加载成功",Toast.LENGTH_LONG).show()
-            }else{
-                Toast.makeText(this,"my_folder.txt文件内容为空",Toast.LENGTH_LONG).show()
+                btn?.isEnabled = true
+                Toast.makeText(this, "加载成功", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, "my_folder.txt文件内容为空", Toast.LENGTH_LONG).show()
             }
         }
     }
 
 
-
     /**
      * 请求权限
      */
-    private fun requestPermission() {
+    private fun requestPermission1() {
 //        var code=checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
         //TODO 待完成
+        if (Build.VERSION.SDK_INT >= 23) {
+            val writeSDCardPermission = checkSelfPermission("android.permission.WRITE_EXTERNAL_STORAGE")
+//            var strings=ArrayList<String>()
+//            strings.add("android.permission.WRITE_EXTERNAL_STORAGE")
+            var strings: Array<String> = arrayOf("android.permission.WRITE_EXTERNAL_STORAGE")
+            requestPermissions(strings, 1)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1) {
+//            Log.e("输出", "测试")
+        }
     }
 
     private fun getNumber(et: EditText) {

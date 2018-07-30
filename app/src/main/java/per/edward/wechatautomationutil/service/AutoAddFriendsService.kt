@@ -23,18 +23,18 @@ class AutoAddFriendsService : AccessibilityService() {
     }
 
     private fun loadFile() {
-        var list= Environment.getExternalStorageDirectory().listFiles()
-        var filePath: String? =null
+        var list = Environment.getExternalStorageDirectory().listFiles()
+        var filePath: String? = null
         for (i in list) {//寻找指定文件
             if (i.name.contains("my_folder.txt")) {
-                filePath= i.path
+                filePath = i.path
                 break
             }
         }
 
         var file = File(filePath)
         if (file.isFile) {
-            var content= FileUtils.readTxtFile(file)
+            var content = FileUtils.readTxtFile(file)
 //            Log.e("输出",content)
             listNumber = content.split("\n") as ArrayList<String>
         }
