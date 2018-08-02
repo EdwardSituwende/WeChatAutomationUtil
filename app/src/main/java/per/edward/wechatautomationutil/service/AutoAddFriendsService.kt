@@ -2,6 +2,7 @@ package per.edward.wechatautomationutil.service
 
 import android.accessibilityservice.AccessibilityService
 import android.app.Activity
+import android.app.Instrumentation
 import android.os.Environment
 import android.os.Handler
 import android.text.TextUtils
@@ -16,6 +17,12 @@ import per.edward.wechatautomationutil.utils.LogUtil
 import per.edward.wechatautomationutil.utils.OperationUtils
 import java.io.File
 import java.util.ArrayList
+import android.R.attr.y
+import android.R.attr.x
+import android.view.MotionEvent
+import android.os.SystemClock
+
+
 
 class AutoAddFriendsService : AccessibilityService() {
     override fun onServiceConnected() {
@@ -63,14 +70,28 @@ class AutoAddFriendsService : AccessibilityService() {
 //            temp=accessibilityNodeInfo
             clearPasteFriendsNumber()
         } else if (classNameStr == "com.tencent.mm.plugin.profile.ui.ContactInfoUI") {//1             1         android.widget.RelativeLayout
-            addToContacts()
+//            addToContacts()
         } else if (classNameStr == "com.tencent.mm.plugin.profile.ui.SayHiWithSnsPermissionUI") {
-            sendFinish()
+//            sendFinish()
         }else if (eventType.toString() == "1" && classNameStr == "android.widget.RelativeLayout") {//查找不到用户的情况
 //            stepThree=false
 //            clearPasteFriendsNumber()
 
             clearText()
+        }else if (classNameStr == "com.tencent.mm.ui.LauncherUI") {
+            var thread=Thread({
+//                try {
+                    val inst = Instrumentation()
+                    inst.sendPointerSync(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
+                            MotionEvent.ACTION_DOWN, 170F,523F, 0))
+                    inst.sendPointerSync(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
+                            MotionEvent.ACTION_UP, 170F, 523F, 0))
+                    LogUtil.e("点击位置")
+//                } catch (e: Exception) {
+//                    LogUtil.e("Exception when sendPointerSync")
+//                }
+            })
+            thread.start()
         }
     }
 
@@ -79,20 +100,38 @@ class AutoAddFriendsService : AccessibilityService() {
 //    /**
 //     */
     private fun clearText(){
-    if (pasteList != null && pasteList?.size != 0) {
-        var temp = OperationUtils.pasteContent(this, pasteList!![0], listNumber[i++])
-        if (temp) {
-            goSearchFriends()
-        }
-    }
+            Handler().postDelayed({
+//                accessibilityNodeInfo.getChild(0).gets
+//            val ac = accessibilityNodeInfo?.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/bd3")//微信6.6.7版本修改为发表
+//            if (ac != null && ac.size != 0) {
+////                var temp = ac[0].parent
+////                if (temp != null) {
+////                   OperationUtils.performClickBtn(temp)
+////                }
+//
+//
+//
+//            }
+        }, TEMP.toLong())
+
+//         var list=accessibilityNodeInfo?
+//    LogUtil.e("输出"+accessibilityNodeInfo?.parent?.className)
+//        performGlobalAction(GLOBAL_ACTION_BACK)
+
+//    if (pasteList != null && pasteList?.size != 0) {
+//        var temp = OperationUtils.pasteContent(this, pasteList!![0], listNumber[i++])
+//        if (temp) {
+//            goSearchFriends()
+//        }
+//    }
     }
 //
 //    /**
 //     * 点击微信右上角更多
 //     */
     private fun modifyData() {
-        val list = accessibilityNodeInfo?.findAccessibilityNodeInfosByText("更多功能按钮")//微信6.6.6版本修改为发表
-        stepOne = OperationUtils.performClickBtn(list)
+//        val list = accessibilityNodeInfo?.findAccessibilityNodeInfosByText("更多功能按钮")//微信6.6.6版本修改为发表
+//        stepOne = OperationUtils.performClickBtn(list)
     }
 //
 //    /**
