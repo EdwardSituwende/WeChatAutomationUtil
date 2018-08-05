@@ -11,9 +11,18 @@
         android:layout_height="wrap_content"
         android:text="打开辅助功能开关"/>
 
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_below="@+id/open_accessibility_setting"
+        android:id="@+id/et_load_path"
+        android:visibility="gone"
+        android:hint="加载路径"
+        android:text="/mnt/shared/my_folder.txt"
+        android:layout_height="wrap_content" />
+
     <Button
         android:layout_width="match_parent"
-        android:layout_below="@id/open_accessibility_setting"
+        android:layout_below="@id/et_load_path"
         android:text="加载txt文件"
         android:id="@+id/btn_loading_txt"
         android:layout_height="wrap_content"/>
@@ -32,6 +41,7 @@
         android:layout_below="@+id/tv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone"
         android:layout_above="@+id/btn_sure"
         android:gravity="top|left"
         android:hint="输入微信号"

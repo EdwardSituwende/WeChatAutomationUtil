@@ -2,26 +2,20 @@ package per.edward.wechatautomationutil.ui
 
 import android.Manifest
 import android.app.Activity
-import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import per.edward.wechatautomationutil.ConstantData
 import per.edward.wechatautomationutil.R
-import per.edward.wechatautomationutil.utils.Constant
-import per.edward.wechatautomationutil.utils.FileUtils
-import per.edward.wechatautomationutil.utils.LogUtil
-import per.edward.wechatautomationutil.utils.WxUtils
+import per.edward.wechatautomationutil.R.id.et_load_path
+import per.edward.wechatautomationutil.utils.*
 import java.io.*
-import java.util.ArrayList
 
 
 /**
@@ -50,6 +44,8 @@ class AutoAddFriendsActivity : AppCompatActivity() {
     }
 
 
+
+
     private fun loadFile() {
         var list = Environment.getExternalStorageDirectory().listFiles()
         if (list == null) {
@@ -64,12 +60,12 @@ class AutoAddFriendsActivity : AppCompatActivity() {
             }
         }
 
-        if (filePath == null) {
+        var file = File(filePath)
+        if (file == null) {
             Toast.makeText(this, "没有找my_folder.txt文件", Toast.LENGTH_LONG).show()
             return
         }
 
-        var file = File(filePath)
         if (file.isFile) {
             var content = FileUtils.readTxtFile(file)
             if (!TextUtils.isEmpty(content)) {
@@ -95,6 +91,8 @@ class AutoAddFriendsActivity : AppCompatActivity() {
                 var strings: Array<String> = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
                 requestPermissions(strings, 1)
             }
+        }else{
+            loadFile()
         }
     }
 
@@ -129,6 +127,15 @@ class AutoAddFriendsActivity : AppCompatActivity() {
         editor.apply()
 //        Toast.makeText(baseContext, et.text.toString(), Toast.LENGTH_SHORT).show()
         WxUtils.openWx(this)//打开微信
+
+//        Handler().postDelayed({
+//            MockOperationUtils.execShellCmd("input text helloaworld")
+//            MockOperationUtils.execShellCmd("input keyevent 66")
+//        }, 5000)
+
+
     }
+
+
 
 }
