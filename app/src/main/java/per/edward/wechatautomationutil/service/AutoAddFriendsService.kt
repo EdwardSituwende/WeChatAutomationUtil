@@ -30,10 +30,16 @@ class AutoAddFriendsService : AccessibilityService() {
         var list = Environment.getExternalStorageDirectory().listFiles()
         var filePath: String? = null
         for (i in list) {//寻找指定文件
+            Log.e("输出",i.path)
             if (i.name.contains(Constant.WX_NUMBER_FILE_NAME)) {
                 filePath = i.path
                 break
             }
+        }
+
+        if (TextUtils.isEmpty(filePath)) {
+            Toast.makeText(baseContext,"没有找到文件",Toast.LENGTH_LONG).show()
+            return
         }
 
         var file = File(filePath)
@@ -46,7 +52,7 @@ class AutoAddFriendsService : AccessibilityService() {
     override fun onInterrupt() {
     }
 
-    private val TEMP = 3000
+    private val TEMP = 3500
     private var accessibilityNodeInfo: AccessibilityNodeInfo? = null
     private var sendFinish = false
     private var listNumber = ArrayList<String>()

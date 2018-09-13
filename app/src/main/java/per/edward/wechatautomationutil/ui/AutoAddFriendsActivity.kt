@@ -60,6 +60,11 @@ class AutoAddFriendsActivity : AppCompatActivity() {
             }
         }
 
+        if (TextUtils.isEmpty(filePath)) {
+            Toast.makeText(baseContext,"没有找到文件",Toast.LENGTH_LONG).show()
+            return
+        }
+
         var file = File(filePath)
         if (file == null) {
             Toast.makeText(this, "没有找my_folder.txt文件", Toast.LENGTH_LONG).show()
