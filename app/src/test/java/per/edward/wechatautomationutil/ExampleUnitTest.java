@@ -2,7 +2,9 @@ package per.edward.wechatautomationutil;
 
 import org.junit.Test;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -16,20 +18,14 @@ public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() throws Exception {
 
-        readData("helloworld123\n哈哈\nhelloworld12345");
+//        readData("helloworld123\n哈哈\nhelloworld12345");
     }
 
-    private void readData(String temp) {
-        List<String> list = new ArrayList<String>();
-        //        String[] listData = temp.split("\n");
-        list.add("测1试");
-        list.add("测2试");
-        list.add("测3试");
-        list.set(1,list.get(1)+ "123");
-        for (int i = 0; i < list.size(); i++) {
-            System.out.println(list.get(i));
-        }
-
+    @Test
+    public void readData11() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
+       String t1=simpleDateFormat.format(new Date(System.currentTimeMillis()));
+        System.out.println(t1);
 //        for (int i = 0; i < list.size(); i++) {
 //        }
     }

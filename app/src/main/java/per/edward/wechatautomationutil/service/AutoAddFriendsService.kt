@@ -38,7 +38,7 @@ class AutoAddFriendsService : AccessibilityService() {
         }
 
         if (TextUtils.isEmpty(filePath)) {
-            Toast.makeText(baseContext,"没有找到文件",Toast.LENGTH_LONG).show()
+            Toast.makeText(baseContext,"没有找到文件",Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -55,6 +55,8 @@ class AutoAddFriendsService : AccessibilityService() {
     private val TEMP = 3500
     private var accessibilityNodeInfo: AccessibilityNodeInfo? = null
     private var sendFinish = false
+    @Volatile
+    private var isCancelClearText=false
     private var listNumber = ArrayList<String>()
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         accessibilityNodeInfo = rootInActiveWindow
@@ -64,9 +66,11 @@ class AutoAddFriendsService : AccessibilityService() {
         if (classNameStr == "com.tencent.mm.ui.LauncherUI") {
             i = 0
             sendFinish=false
-        }else if (classNameStr == "com.tencent.mm.plugin.subapp.ui.pluginapp.AddMoreFriendsUI") {
-            firstStep()
-        } else if (classNameStr == "com.tencent.mm.plugin.fts.ui.FTSAddFriendUI") {
+        }else
+//            if (classNameStr == "com.tencent.mm.plugin.subapp.ui.pluginapp.AddMoreFriendsUI") {
+//            firstStep()
+//        } else
+                if (classNameStr == "com.tencent.mm.plugin.fts.ui.FTSAddFriendUI") {//2048             800         android.widget.LinearLayout
             clearText()
         } else if (classNameStr == "com.tencent.mm.plugin.profile.ui.ContactInfoUI") {//1             1         android.widget.RelativeLayout
             addContacts()
@@ -75,8 +79,8 @@ class AutoAddFriendsService : AccessibilityService() {
         }
     }
 
-    private val ADD_FRIENDS_COUNT:Int=15
-    private val TIME:Long=2*3600//单位:秒
+    private val ADD_FRIENDS_COUNT:Int=15//15
+    private val TIME:Long=2*3600//单位:秒2*3600
 
     private fun firstStep() {
         Handler().postDelayed({
@@ -86,20 +90,30 @@ class AutoAddFriendsService : AccessibilityService() {
 
     private fun clearText(){
         Thread({
-            if ((i + 1 )% ADD_FRIENDS_COUNT == 0) {//每添加15个好友，暂停
-                LogUtil.e("开始休眠")
-                Thread.sleep(TIME*1000)
-            }
-            LogUtil.e("开始结束")
-                Handler(mainLooper).postDelayed({
-                    if (i < listNumber.size) {
-                        sendFinish = false
-                        MockOperationUtils.execShellCmd("input tap 1039 100")//点击删除按钮
-                        MockOperationUtils.execShellCmd("input tap 1035 50")//获取输入框焦点
-                        MockOperationUtils.execShellCmd("input text " + listNumber[i++])
-                        searchFriends()
+            Handler(mainLooper).postDelayed({
+                if (!isCancelClearText) {
+                    isCancelClearText=false
+                    if ((i + 1) % ADD_FRIENDS_COUNT == 0) {//每添加15个好友，暂停
+                        Toast.makeText(baseContext,"开始休眠"+(TIME * 1000),Toast.LENGTH_SHORT).show()
+                        Thread.sleep(TIME * 1000)
+                        Toast.makeText(baseContext,"休眠结束",Toast.LENGTH_SHORT).show()
                     }
-                }, TEMP.toLong())
+                    LogUtil.e("开始结束")
+
+                        if (i < listNumber.size) {
+                            sendFinish = false
+                            MockOperationUtils.execShellCmd("input tap 1039 100")//点击删除按钮
+                            MockOperationUtils.execShellCmd("input tap 1035 50")//获取输入框焦点
+                            Thread.sleep(500)
+                            var friends=listNumber[i++]
+                            MockOperationUtils.execShellCmd("input text $friends")
+                            Toast.makeText(baseContext,"添加"+friends+"为好友",Toast.LENGTH_SHORT).show()
+                            searchFriends()
+                        }else{
+                            Toast.makeText(baseContext,"好友添加完毕",Toast.LENGTH_SHORT).show()
+                        }
+                }
+            }, TEMP.toLong())
         }).start()
     }
 
@@ -113,11 +127,21 @@ class AutoAddFriendsService : AccessibilityService() {
      * 点击添加好友选项
      */
     private fun addContacts() {
+        isCancelClearText=true
         Handler().postDelayed({
+            isCancelClearText=false
             if (sendFinish) {
-                MockOperationUtils.execShellCmd("input tap 40 100")
+                MockOperationUtils.execShellCmd("input tap 40 100")//点击后退
             }else{
-                MockOperationUtils.execShellCmd("input tap 370 810")
+                //通过“送消息”三个字来判断是否好友，如果是则直接返回
+                var  clearList = accessibilityNodeInfo?.findAccessibilityNodeInfosByText("发消息")
+                if (clearList != null && clearList.size > 0) {
+                    MockOperationUtils.execShellCmd("input tap 40 100")//点击后退
+                }else{
+//                    MockOperationUtils.execShellCmd("input tap 370 810")//点击添加好友
+                    var  clearList = accessibilityNodeInfo?.findAccessibilityNodeInfosByText("添加到通讯录")
+                    OperationUtils.performClickBtn(clearList)
+                }
             }
         }, TEMP.toLong())
     }
@@ -168,7 +192,7 @@ class AutoAddFriendsService : AccessibilityService() {
 //                }
 //            } else {
 //                LogUtil.e("已添加" + listNumber.size + "个好友，好友添加完毕！")
-//                Toast.makeText(baseContext, "已添加" + listNumber.size + "个好友，好友添加完毕！", Toast.LENGTH_LONG).show()
+//                Toast.makeText(baseContext, "已添加" + listNumber.size + "个好友，好友添加完毕！", Toast.LENGTH_SHORT).show()
 //            }
 //        }, TEMP.toLong())
 //
