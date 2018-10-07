@@ -9,50 +9,57 @@
         android:id="@+id/open_accessibility_setting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="打开辅助功能开关"/>
+        android:text="打开辅助功能开关" />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_below="@+id/open_accessibility_setting"
-        android:id="@+id/et_load_path"
-        android:visibility="gone"
-        android:hint="加载路径"
-        android:text="/mnt/shared/my_folder.txt"
-        android:layout_height="wrap_content" />
+    <!--<EditText-->
+        <!--android:id="@+id/et_load_path"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_below="@+id/open_accessibility_setting"-->
+        <!--android:hint="加载路径"-->
+        <!--android:text="/mnt/shared/my_folder.txt"-->
+        <!--android:visibility="gone" />-->
 
     <Button
-        android:layout_width="match_parent"
-        android:layout_below="@id/et_load_path"
-        android:text="加载txt文件"
         android:id="@+id/btn_loading_txt"
-        android:layout_height="wrap_content"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/open_accessibility_setting"
+        android:text="加载txt文件" />
+
+    <Button
+        android:id="@+id/btn_remove_friends_index"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_loading_txt"
+        android:text="删除下标（当前下标：0）" />
 
     <TextView
         android:id="@+id/tv"
-        android:layout_below="@+id/btn_loading_txt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_remove_friends_index"
         android:gravity="center_horizontal"
-        app:layout_constraintTop_toBottomOf="@id/open_accessibility_setting"
-        android:text="特别注意：仅支持微信6.6.7版本" />
+        android:text="特别注意：仅支持微信6.6.7版本"
+        app:layout_constraintTop_toBottomOf="@id/open_accessibility_setting" />
 
     <EditText
         android:id="@+id/et"
-        android:layout_below="@+id/tv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
         android:layout_above="@+id/btn_sure"
+        android:layout_below="@+id/tv"
         android:gravity="top|left"
         android:hint="输入微信号"
-        android:text="helloworld123\nhelloworld12345"/>
+        android:text="helloworld123\nhelloworld12345"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/btn_sure"
-        android:layout_alignParentBottom="true"
-        android:enabled="false"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="确定" />
+        android:layout_alignParentBottom="true"
+        android:enabled="false"
+        android:text="确定"
+        app:layout_constraintBottom_toBottomOf="parent" />
 </RelativeLayout>

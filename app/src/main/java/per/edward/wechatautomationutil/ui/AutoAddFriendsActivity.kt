@@ -2,18 +2,19 @@ package per.edward.wechatautomationutil.ui
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
-import android.widget.Button
+import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_add_friends.*
 import per.edward.wechatautomationutil.R
-import per.edward.wechatautomationutil.R.id.et_load_path
 import per.edward.wechatautomationutil.utils.*
 import java.io.*
 
@@ -22,28 +23,54 @@ import java.io.*
  * 自动添加好友
  */
 class AutoAddFriendsActivity : AppCompatActivity() {
-    var btn: Button? = null
+    private var sharedPreferences: SharedPreferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_friends)
 
-        var et = findViewById<EditText>(R.id.et)
-        btn = findViewById<Button>(R.id.btn_sure)
-        btn?.setOnClickListener {
-            getNumber(et)
-        }
 
-        findViewById<Button>(R.id.open_accessibility_setting).setOnClickListener {
-            AccessibilityOpenHelperActivity.jumpToSettingPage(baseContext)
-        }
 
-        findViewById<Button>(R.id.btn_loading_txt).setOnClickListener {
-            requestStoragePermission()
+        initCallback()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadFriendsIndex()
+        Log.e("输出","123123")
+    }
+
+    private fun loadFriendsIndex() {
+        sharedPreferences = getSharedPreferences(Constant.FILE_FRIEND_INDEX, Activity.MODE_MULTI_PROCESS)
+        if (sharedPreferences != null) {
+            var indexStr = sharedPreferences!!.getInt(Constant.GET_FRIENDS, 0)
+            btn_remove_friends_index.text = "删除下标（当前下标：$indexStr)"
         }
     }
 
+    private fun initCallback() {
+        btn_remove_friends_index.setOnClickListener {
+            if (sharedPreferences != null) {
+                var edit = sharedPreferences!!.edit()
+                edit.clear()
+                edit.apply()
+                Toast.makeText(baseContext, "删除成功", Toast.LENGTH_LONG).show()
+                loadFriendsIndex()//重新加载数据
+            }
+        }
 
+        btn_sure.setOnClickListener {
+            getNumber(et)
+        }
+
+        open_accessibility_setting.setOnClickListener {
+            AccessibilityOpenHelperActivity.jumpToSettingPage(baseContext)
+        }
+
+        btn_loading_txt.setOnClickListener {
+            requestStoragePermission()
+        }
+    }
 
 
     private fun loadFile() {
@@ -61,7 +88,7 @@ class AutoAddFriendsActivity : AppCompatActivity() {
         }
 
         if (TextUtils.isEmpty(filePath)) {
-            Toast.makeText(baseContext,"没有找到文件",Toast.LENGTH_LONG).show()
+            Toast.makeText(baseContext, "没有找到文件", Toast.LENGTH_LONG).show()
             return
         }
 
@@ -74,7 +101,7 @@ class AutoAddFriendsActivity : AppCompatActivity() {
         if (file.isFile) {
             var content = FileUtils.readTxtFile(file)
             if (!TextUtils.isEmpty(content)) {
-                btn?.isEnabled = true
+                btn_sure.isEnabled = true
                 LogUtil.e("输出：$content")//输出内容方便调试
                 Toast.makeText(this, "加载成功", Toast.LENGTH_LONG).show()
             } else {
@@ -92,11 +119,11 @@ class AutoAddFriendsActivity : AppCompatActivity() {
             val writeSDCardPermission = checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
             if (writeSDCardPermission == PackageManager.PERMISSION_GRANTED) {
                 loadFile()
-            }else{
+            } else {
                 var strings: Array<String> = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
                 requestPermissions(strings, 1)
             }
-        }else{
+        } else {
             loadFile()
         }
     }
@@ -105,7 +132,7 @@ class AutoAddFriendsActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 1) {
             if (permissions.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "读取权限授权失败，请允许存储权限后再试", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "读取权限授权失败，请允许存储权限后再试", Toast.LENGTH_SHORT).show()
             } else {
                 loadFile()
             }
@@ -130,17 +157,8 @@ class AutoAddFriendsActivity : AppCompatActivity() {
         val editor = sharedPreferences.edit()
         editor.putString("content", et.text.toString())
         editor.apply()
-//        Toast.makeText(baseContext, et.text.toString(), Toast.LENGTH_SHORT).show()
         WxUtils.openWx(this)//打开微信
-
-//        Handler().postDelayed({
-//            MockOperationUtils.execShellCmd("input text helloaworld")
-//            MockOperationUtils.execShellCmd("input keyevent 66")
-//        }, 5000)
-
-
     }
-
 
 
 }

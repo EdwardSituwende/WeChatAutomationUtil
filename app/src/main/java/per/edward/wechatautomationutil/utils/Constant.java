@@ -5,7 +5,7 @@ package per.edward.wechatautomationutil.utils;
  */
 
 public class Constant {
-    public static final String IS_SENDED="is_sended";
+    public static final String IS_SENDED = "is_sended";
 
     public static final String WECHAT_STORAGE = "WebChat_Auto";
 
@@ -17,4 +17,7 @@ public class Constant {
 
     public static final String WX_NUMBER_FILE_NAME = "my_folder.txt";
 
+    public static final String FILE_FRIEND_INDEX = "file_friends_index";
+
+    public static final String GET_FRIENDS = "get_friends";
 }
